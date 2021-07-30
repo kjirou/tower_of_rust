@@ -1,11 +1,12 @@
 fn main() {
     println!("-- main --");
     move_ownership();
-    reference_check_2();
+    //reference_check_2();
 }
 
 fn move_ownership() {
     println!("-- move_ownership --");
+    // TODO: これはコピーセマンティクスなので例として不適切。
     let a = 1;
     let b = a;
     println!("{}", a);
