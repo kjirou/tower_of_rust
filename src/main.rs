@@ -6,11 +6,11 @@ fn main() {
 
 fn move_ownership() {
     println!("-- move_ownership --");
-    // TODO: これはコピーセマンティクスなので例として不適切。
-    let a = 1;
-    let b = a;
+    // 文字列リテラルで宣言すると値はスタックに積まれるため、変数には参照になる。
+    let a = String::from("hello");
+    // これを有効にすると、a -> b に所有権が移動する。
+    //let b = a;
     println!("{}", a);
-    println!("{}", b);
 }
 
 fn reference_check() {
