@@ -1,16 +1,7 @@
-#[derive(Clone)]
-struct Cell {
-    // TODO: いくつかの ANCI escape code の列挙を設定する。
-    pub background: String,
-    pub foreground: String,
-    pub symbol: char,
-    pub x: u8,
-    pub y: u8,
-}
+extern crate tower_of_rust;
 
-struct Screen {
-    matrix: [[Cell; 80]; 24],
-}
+use tower_of_rust::screen::Cell;
+use tower_of_rust::screen::Screen;
 
 fn main() {
     let default_cell = Cell {
