@@ -1,5 +1,8 @@
+extern crate termion;
+
 extern crate tower_of_rust;
 
+use termion::{clear, cursor, style};
 use tower_of_rust::screen::Screen;
 
 fn main() {
@@ -15,5 +18,12 @@ fn main() {
         .collect::<Vec<String>>()
         .join("\n");
 
-    println!("{}", output);
+    println!("\n{}{}{}{}",
+        cursor::Hide,
+        clear::All,
+        cursor::Goto(1, 1),
+        output);
+    println!("{}{}",
+        style::Reset,
+        cursor::Show);
 }
