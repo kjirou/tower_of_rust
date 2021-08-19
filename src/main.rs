@@ -3,6 +3,7 @@ extern crate termion;
 extern crate tower_of_rust;
 
 use termion::{clear, cursor, style};
+use tower_of_rust::models::field::Field;
 use tower_of_rust::screen::Screen;
 
 fn main() {
@@ -26,4 +27,8 @@ fn main() {
     println!("{}{}",
         style::Reset,
         cursor::Show);
+
+    // TODO: For debugging.
+    let field = Field::new(3, 2);
+    println!("{:?}", field);
 }
