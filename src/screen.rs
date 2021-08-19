@@ -22,7 +22,6 @@ impl Screen {
             foreground: String::from(""),
         };
         let mut screen = Screen {
-            // TODO: 大量のコードが邪魔なので一旦別のファイルに移動する。
             // TODO: 短くする。おそらくマクロでどうにかする気はする。または ndarray などのライブラリで解決する。
             matrix: [
                 [
