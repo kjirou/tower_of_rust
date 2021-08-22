@@ -4,10 +4,21 @@ extern crate termion;
 extern crate tower_of_rust;
 
 use clap::{Arg, App};
-
 use termion::{clear, cursor, style};
 use tower_of_rust::models::field::Field;
 use tower_of_rust::screen::Screen;
+
+fn create_output(screen: &Screen) -> String {
+    screen.matrix.iter()
+        .map(|row| {
+            row.iter()
+                .map(|cell| cell.symbol.to_string())
+                .collect::<Vec<String>>()
+                .join("")
+        })
+        .collect::<Vec<String>>()
+        .join("\n")
+}
 
 fn main() {
     let command_args = App::new("A Tower of Rust")
@@ -32,20 +43,12 @@ fn main() {
             screen.matrix[y][x].symbol = field_element.get_display();
         }
     }
-
-    let output = screen.matrix.iter()
-        .map(|row| {
-            row.iter()
-                .map(|cell| cell.symbol.to_string())
-                .collect::<Vec<String>>()
-                .join("")
-        })
-        .collect::<Vec<String>>()
-        .join("\n");
     
     if command_args.is_present("debug") {
+        let output = create_output(&screen);
         println!("{}", output);
     } else {
+        let output = create_output(&screen);
         println!("\n{}{}{}{}",
             cursor::Hide,
             clear::All,
