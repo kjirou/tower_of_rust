@@ -1,14 +1,20 @@
 extern crate clap;
 extern crate termion;
-
 extern crate tower_of_rust;
 
 use clap::{Arg, App};
+use std::io::{self, Write};
+use std::sync::mpsc;
+use std::thread;
+use std::time::Duration;
 use termion::{clear, cursor, style};
+use termion::event::Key;
+use termion::input::TermRead;
+use termion::raw::IntoRawMode;
 use tower_of_rust::models::field::Field;
 use tower_of_rust::screen::Screen;
 
-fn create_output(screen: &Screen) -> String {
+fn create_output_as_lines(screen: &Screen) -> Vec::<String> {
     screen.matrix.iter()
         .map(|row| {
             row.iter()
@@ -17,7 +23,6 @@ fn create_output(screen: &Screen) -> String {
                 .join("")
         })
         .collect::<Vec<String>>()
-        .join("\n")
 }
 
 fn main() {
@@ -37,17 +42,58 @@ fn main() {
     screen.update(&field);
     
     if command_args.is_present("debug") {
-        let output = create_output(&screen);
+        let output = create_output_as_lines(&screen).join("\n");
         println!("{}", output);
     } else {
-        let output = create_output(&screen);
-        println!("\n{}{}{}{}",
-            cursor::Hide,
-            clear::All,
-            cursor::Goto(1, 1),
-            output);
-        println!("{}{}",
-            style::Reset,
-            cursor::Show);
+        let (tx, rx): (std::sync::mpsc::Sender<Key>, std::sync::mpsc::Receiver<Key>) = mpsc::channel();
+
+        let main_loop_handle = thread::spawn(move || {
+            let mut stdout = io::stdout().into_raw_mode().unwrap();
+
+            write!(stdout, "{}{}", cursor::Hide, clear::All).unwrap();
+            stdout.flush().unwrap();
+
+            loop {
+                match rx.try_recv() {
+                    Ok(key_input) => {
+                        // TODO: For debug.
+                        print!("{:?}", key_input);
+                        match key_input {
+                            Key::Esc | Key::Ctrl('c') | Key::Char('q') => {
+                                break;
+                            },
+                            _ => {},
+                        };
+                    },
+                    Err(_) => {},
+                };
+
+                for (i, line) in create_output_as_lines(&screen).iter().enumerate() {
+                    write!(stdout, "{}{}", cursor::Goto(1, i as u16 + 1), line).unwrap();
+                }
+                stdout.flush().unwrap();
+
+                thread::sleep(Duration::from_millis(33));
+            }
+
+            write!(stdout, "{}{}", style::Reset, cursor::Show).unwrap();
+            stdout.flush().unwrap();
+        });
+
+        let stdin = io::stdin();
+        for key_input in stdin.keys() {
+            let key_input = key_input.unwrap();
+            match key_input {
+                Key::Esc | Key::Ctrl('c') | Key::Char('q') => {
+                    tx.send(key_input).unwrap();
+                    break;
+                },
+                Key::Char(key_input) => tx.send(Key::Char(key_input)).unwrap(),
+                _ => {},
+            };
+        }
+
+        // NOTE: Must wait here to unlock Row Mode and reset ANSI.
+        main_loop_handle.join().unwrap();
     }
 }
