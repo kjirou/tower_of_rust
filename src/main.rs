@@ -31,18 +31,10 @@ fn main() {
         .get_matches();
 
     let mut field = Field::new(25, 9);
-
     field.surround_with_walls();
 
     let mut screen = Screen::new();
-
-    // TODO: screen と models を直接参照させない。間に React の Props みたいな更新クエリの概念を挟む。
-    for (y, row_of_field_element) in field.matrix.iter().enumerate() {
-        for (x, field_element) in row_of_field_element.iter().enumerate() {
-            // TODO: FieldElement の位置と Screen の位置が同じになるとは限らない。というか、Field の方が Screen の Field 描画範囲より大きい。
-            screen.matrix[y][x].symbol = field_element.get_display();
-        }
-    }
+    screen.update(&field);
     
     if command_args.is_present("debug") {
         let output = create_output(&screen);

@@ -1,3 +1,5 @@
+use crate::models::field::Field;
+
 #[derive(Clone)]
 pub struct Cell {
     // TODO: いくつかの ANCI escape code の列挙を設定する。
@@ -472,5 +474,14 @@ impl Screen {
             }
         }
         screen
+    }
+    // TODO: models を直接参照しない。間に React の Props みたいな更新クエリの概念を挟む。
+    pub fn update(&mut self, field: &Field) {
+        for (y, row_of_field_element) in field.matrix.iter().enumerate() {
+            for (x, field_element) in row_of_field_element.iter().enumerate() {
+                // TODO: FieldElement の位置と Screen の位置が同じになるとは限らない。というか、普通は Field の方が Screen の Field 描画範囲より大きい。
+                self.matrix[y][x].symbol = field_element.get_display();
+            }
+        }
     }
 }
