@@ -60,6 +60,9 @@ fn main() {
                     Err(_) => {},
                 };
 
+                // Purge extra key inputs in the same frame.
+                while rx.try_recv().is_err() == false {};
+
                 for (i, line) in screen.create_output_as_lines().iter().enumerate() {
                     write!(stdout, "{}{}", cursor::Goto(1, i as u16 + 1), line).unwrap();
                 }
