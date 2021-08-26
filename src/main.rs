@@ -14,17 +14,6 @@ use termion::raw::IntoRawMode;
 use tower_of_rust::models::field::Field;
 use tower_of_rust::screen::Screen;
 
-fn create_output_as_lines(screen: &Screen) -> Vec::<String> {
-    screen.matrix.iter()
-        .map(|row| {
-            row.iter()
-                .map(|cell| cell.symbol.to_string())
-                .collect::<Vec<String>>()
-                .join("")
-        })
-        .collect::<Vec<String>>()
-}
-
 fn main() {
     let command_args = App::new("A Tower of Rust")
         .arg(
@@ -42,7 +31,7 @@ fn main() {
     screen.update(&field);
     
     if command_args.is_present("debug") {
-        let output = create_output_as_lines(&screen).join("\n");
+        let output = screen.create_output_as_lines().join("\n");
         println!("{}", output);
     } else {
         let (tx, rx): (std::sync::mpsc::Sender<Key>, std::sync::mpsc::Receiver<Key>) = mpsc::channel();
@@ -68,7 +57,7 @@ fn main() {
                     Err(_) => {},
                 };
 
-                for (i, line) in create_output_as_lines(&screen).iter().enumerate() {
+                for (i, line) in screen.create_output_as_lines().iter().enumerate() {
                     write!(stdout, "{}{}", cursor::Goto(1, i as u16 + 1), line).unwrap();
                 }
                 stdout.flush().unwrap();

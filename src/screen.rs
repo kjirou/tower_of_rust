@@ -484,4 +484,14 @@ impl Screen {
             }
         }
     }
+    pub fn create_output_as_lines(&self) -> Vec::<String> {
+        self.matrix.iter()
+            .map(|row| {
+                row.iter()
+                    .map(|cell| cell.symbol.to_string())
+                    .collect::<Vec<String>>()
+                    .join("")
+            })
+            .collect::<Vec<String>>()
+    }
 }
