@@ -19,6 +19,7 @@ impl FieldElement {
         // TODO: 先頭の FieldObject が常に描画対象になるかは要検討。
         let first = &self.field_objects[0];
         match first.display_kind {
+            DisplayKind::Hero => '@',
             DisplayKind::Wall => '#',
         }
     }
@@ -52,6 +53,9 @@ impl Field {
             max_x: width - 1,
             max_y: height - 1,
         }
+    }
+    pub fn place_field_object(&mut self, xy: (usize, usize), field_object: FieldObject) {
+        self.matrix[xy.1][xy.0].field_objects.push(field_object);
     }
     pub fn surround_with_walls(&mut self) {
         let size = self.get_size_data();

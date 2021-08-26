@@ -1,5 +1,6 @@
 #[derive(Debug)]
 pub enum DisplayKind {
+    Hero,
     Wall,
 }
 
@@ -10,6 +11,12 @@ pub struct FieldObject {
 }
 
 impl FieldObject {
+    pub fn new_hero() -> FieldObject {
+        FieldObject {
+            display_kind: DisplayKind::Hero,
+            is_obstacle: true,
+        }
+    }
     pub fn new_wall() -> FieldObject {
         FieldObject {
             display_kind: DisplayKind::Wall,

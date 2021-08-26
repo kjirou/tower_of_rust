@@ -12,6 +12,7 @@ use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use tower_of_rust::models::field::Field;
+use tower_of_rust::models::field_object::FieldObject;
 use tower_of_rust::screen::Screen;
 use tower_of_rust::screen_update::MapElementUpdate;
 use tower_of_rust::screen_update::ScreenUpdate;
@@ -53,6 +54,7 @@ fn main() {
 
     let mut field = Field::new(120, 36);
     field.surround_with_walls();
+    field.place_field_object((2, 2), FieldObject::new_hero());
 
     let mut screen = Screen::new();
     screen.update(&create_screen_update(&field));
