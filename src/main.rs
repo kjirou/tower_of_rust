@@ -37,6 +37,9 @@ fn main() {
         let (tx, rx): (std::sync::mpsc::Sender<Key>, std::sync::mpsc::Receiver<Key>) = mpsc::channel();
 
         let main_loop_handle = thread::spawn(move || {
+            // NOTE: Restores the state of the previous terminal when dropping `stdout` variable.
+            //       https://github.com/redox-os/termion/blob/dce5e7500fd709987f9bf8f3911e4daa61d0ad14/src/raw.rs#L34-L37
+            //       If user exits the program without dropping, the terminal will break.
             let mut stdout = io::stdout().into_raw_mode().unwrap();
 
             write!(stdout, "{}{}", cursor::Hide, clear::All).unwrap();
