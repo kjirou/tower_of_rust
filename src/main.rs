@@ -13,6 +13,33 @@ use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use tower_of_rust::models::field::Field;
 use tower_of_rust::screen::Screen;
+use tower_of_rust::screen_update::MapElementUpdate;
+use tower_of_rust::screen_update::ScreenUpdate;
+
+fn create_screen_update(field: &Field) -> ScreenUpdate {
+    let map_size = (21, 13);  // width, height
+    let mut map: Vec<Vec<MapElementUpdate>> = vec![];
+
+    for map_y in 0..map_size.1 {
+        let mut map_row: Vec<MapElementUpdate> = vec![];
+        for map_x in 0..map_size.0 {
+            // TODO: Hero 表示位置が常に Map 中央になるように調整する。
+            // TODO: Field の範囲を超えた時に、何かで埋める。
+            let field_element = &field.matrix[map_y][map_x];
+            let symbol = field_element.get_display();
+            map_row.push(MapElementUpdate {
+                symbol,
+                foreground: String::from(""),
+                background: String::from(""),
+            });
+        }
+        map.push(map_row);
+    }
+
+    ScreenUpdate {
+        map,
+    }
+}
 
 fn main() {
     let command_args = App::new("A Tower of Rust")
@@ -24,11 +51,11 @@ fn main() {
         )
         .get_matches();
 
-    let mut field = Field::new(25, 9);
+    let mut field = Field::new(120, 36);
     field.surround_with_walls();
 
     let mut screen = Screen::new();
-    screen.update(&field);
+    screen.update(&create_screen_update(&field));
     
     if command_args.is_present("debug") {
         let output = screen.create_output_as_lines().join("\n");
@@ -62,6 +89,8 @@ fn main() {
 
                 // Purge extra key inputs in the same frame.
                 while rx.try_recv().is_err() == false {};
+
+                screen.update(&create_screen_update(&field));
 
                 for (i, line) in screen.create_output_as_lines().iter().enumerate() {
                     write!(stdout, "{}{}", cursor::Goto(1, i as u16 + 1), line).unwrap();
