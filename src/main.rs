@@ -34,7 +34,7 @@ fn main() {
         let output = screen.create_output_as_lines().join("\n");
         println!("{}", output);
     } else {
-        let (tx, rx): (std::sync::mpsc::Sender<Key>, std::sync::mpsc::Receiver<Key>) = mpsc::channel();
+        let (tx, rx) = mpsc::channel::<Key>();
 
         let main_loop_handle = thread::spawn(move || {
             // NOTE: Restores the state of the previous terminal when dropping `stdout` variable.
