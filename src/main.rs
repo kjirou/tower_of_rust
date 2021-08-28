@@ -12,12 +12,12 @@ use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use tower_of_rust::models::field::Field;
-use tower_of_rust::models::field::FieldElementPosition;
 use tower_of_rust::models::field_object::FieldObject;
 use tower_of_rust::models::game::Game;
 use tower_of_rust::screen::Screen;
 use tower_of_rust::screen_update::MapElementUpdate;
 use tower_of_rust::screen_update::ScreenUpdate;
+use tower_of_rust::types::FieldElementPosition;
 
 //
 // Reducers

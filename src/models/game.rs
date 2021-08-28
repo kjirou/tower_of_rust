@@ -1,4 +1,4 @@
-use crate::models::field::FieldObjectPosition;
+use crate::types::FieldObjectPosition;
 
 #[derive(Debug)]
 pub struct Game {

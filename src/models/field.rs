@@ -1,5 +1,7 @@
 use crate::models::field_object::DisplayKind;
 use crate::models::field_object::FieldObject;
+use crate::types::FieldElementPosition;
+use crate::types::FieldObjectPosition;
 
 #[derive(Debug)]
 pub struct FieldElement {
@@ -50,12 +52,6 @@ pub struct FieldSizeData {
     max_y: usize,
     width: usize,
 }
-
-// (x, y)
-pub type FieldElementPosition = (usize, usize);
-
-// (x, y, field_object.id)
-pub type FieldObjectPosition = (usize, usize, String);
 
 pub fn xyi_to_xy(xyi: &FieldObjectPosition) -> FieldElementPosition {
     (xyi.1, xyi.0)
