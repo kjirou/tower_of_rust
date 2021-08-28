@@ -26,7 +26,8 @@ fn create_screen_update(field: &Field) -> ScreenUpdate {
         for map_x in 0..map_size.0 {
             // TODO: Hero 表示位置が常に Map 中央になるように調整する。
             // TODO: Field の範囲を超えた時に、何かで埋める。
-            let field_element = &field.matrix[map_y][map_x];
+            let xy = (map_x, map_y);
+            let field_element = field.matrix.get_field_element(&xy);
             let symbol = field_element.get_display();
             map_row.push(MapElementUpdate {
                 symbol,
@@ -53,8 +54,10 @@ fn main() {
         .get_matches();
 
     let mut field = Field::new(120, 36);
-    field.surround_with_walls();
-    field.place_field_object((2, 2), FieldObject::new_hero());
+    field.matrix.surround_with_walls();
+    field.matrix.place_field_object(&(2, 2), FieldObject::new_hero(String::from("player")));
+    field.operation_target = Some((2, 2, String::from("player")));
+    field.move_operation_target(&(2, 3));
 
     let mut screen = Screen::new();
     screen.update(&create_screen_update(&field));
