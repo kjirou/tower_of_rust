@@ -52,27 +52,27 @@ pub struct FieldSizeData {
 }
 
 // (x, y)
-type FieldElementPosition = (usize, usize);
+pub type FieldElementPosition = (usize, usize);
 
 // (x, y, field_object.id)
-type FieldObjectPosition = (usize, usize, String);
+pub type FieldObjectPosition = (usize, usize, String);
 
 pub fn xyi_to_xy(xyi: &FieldObjectPosition) -> FieldElementPosition {
     (xyi.1, xyi.0)
 }
 
 #[derive(Debug)]
-pub struct FieldMatrix {
-    data: Vec<Vec<FieldElement>>,
+pub struct Field {
+    matrix: Vec<Vec<FieldElement>>,
 }
 
-impl FieldMatrix {
+impl Field {
     pub fn get_size_data(&self) -> FieldSizeData {
-        let height = self.data.len();
+        let height = self.matrix.len();
         if height == 0 {
             panic!("There are no rows in the field.");
         }
-        let width = self.data[0].len();
+        let width = self.matrix[0].len();
         if width == 0 {
             panic!("There are no columns in the field.");
         }
@@ -84,18 +84,18 @@ impl FieldMatrix {
         }
     }
     pub fn get_field_element(&self, xy: &FieldElementPosition) -> &FieldElement {
-        &self.data[xy.1][xy.0]
+        &self.matrix[xy.1][xy.0]
     }
     // TODO: field_objet の id を重複して発行しない。他の処理は id は重複してない前提にする。
     pub fn place_field_object(&mut self, xy: &FieldElementPosition, field_object: FieldObject) {
-        self.data[xy.1][xy.0].append_field_object(field_object);
+        self.matrix[xy.1][xy.0].append_field_object(field_object);
     }
     pub fn move_field_object(&mut self, from: &FieldObjectPosition, to: &FieldElementPosition) {
         if &xyi_to_xy(from) == to {
             panic!("Can not move to the same place.");
         }
-        let from_field_element_pointer: *mut FieldElement = &mut self.data[from.1][from.0];
-        let to_field_element_pointer: *mut FieldElement = &mut self.data[to.1][to.0];
+        let from_field_element_pointer: *mut FieldElement = &mut self.matrix[from.1][from.0];
+        let to_field_element_pointer: *mut FieldElement = &mut self.matrix[to.1][to.0];
         unsafe {
             let from_field_element = &mut *from_field_element_pointer;
             let to_field_element = &mut *to_field_element_pointer;
@@ -114,25 +114,8 @@ impl FieldMatrix {
             }
         }
     }
-}
-
-#[derive(Debug)]
-pub struct Field {
-    pub matrix: FieldMatrix,
-    pub operation_target: Option<FieldObjectPosition>,
-}
-
-impl Field {
-    pub fn move_operation_target(&mut self, to: &FieldElementPosition) {
-        match &self.operation_target {
-            Some(operation_target) => self.matrix.move_field_object(operation_target, to),
-            None => {
-                panic!("There is no operation target.");
-            },
-        };
-    }
     pub fn new(width: usize, height: usize) -> Field {
-        let mut matrix_data: Vec<Vec<FieldElement>> = Vec::new();
+        let mut matrix: Vec<Vec<FieldElement>> = Vec::new();
         for y in 0..height {
             let mut row: Vec<FieldElement> = Vec::new();
             for x in 0..width {
@@ -142,13 +125,10 @@ impl Field {
                     field_objects: Vec::new(),
                 });
             }
-            matrix_data.push(row);
+            matrix.push(row);
         }
         Field {
-            matrix: FieldMatrix {
-                data: matrix_data,
-            },
-            operation_target: None,
+            matrix,
         }
     }
 }

@@ -12,10 +12,29 @@ use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use tower_of_rust::models::field::Field;
+use tower_of_rust::models::field::FieldElementPosition;
 use tower_of_rust::models::field_object::FieldObject;
+use tower_of_rust::models::game::Game;
 use tower_of_rust::screen::Screen;
 use tower_of_rust::screen_update::MapElementUpdate;
 use tower_of_rust::screen_update::ScreenUpdate;
+
+//
+// Reducers
+//
+
+fn move_operation_target(game: &Game, field: &mut Field, to: &FieldElementPosition) {
+    match &game.operation_target {
+        Some(operation_target) => field.move_field_object(operation_target, to),
+        None => {
+            panic!("There is no operation target.");
+        },
+    };
+}
+
+//
+// Controller
+//
 
 fn create_screen_update(field: &Field) -> ScreenUpdate {
     let map_size = (21, 13);  // width, height
@@ -27,7 +46,7 @@ fn create_screen_update(field: &Field) -> ScreenUpdate {
             // TODO: Hero 表示位置が常に Map 中央になるように調整する。
             // TODO: Field の範囲を超えた時に、何かで埋める。
             let xy = (map_x, map_y);
-            let field_element = field.matrix.get_field_element(&xy);
+            let field_element = field.get_field_element(&xy);
             let symbol = field_element.get_display();
             map_row.push(MapElementUpdate {
                 symbol,
@@ -53,11 +72,14 @@ fn main() {
         )
         .get_matches();
 
+    let mut game = Game {
+        operation_target: None,
+    };
     let mut field = Field::new(120, 36);
-    field.matrix.surround_with_walls();
-    field.matrix.place_field_object(&(2, 2), FieldObject::new_hero(String::from("player")));
-    field.operation_target = Some((2, 2, String::from("player")));
-    field.move_operation_target(&(2, 3));
+    field.surround_with_walls();
+    field.place_field_object(&(2, 2), FieldObject::new_hero(String::from("player")));
+    game.operation_target = Some((2, 2, String::from("player")));
+    move_operation_target(&game, &mut field, &(2, 3));
 
     let mut screen = Screen::new();
     screen.update(&create_screen_update(&field));
