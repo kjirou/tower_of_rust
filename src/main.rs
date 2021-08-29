@@ -17,20 +17,7 @@ use tower_of_rust::models::game::Game;
 use tower_of_rust::screen::Screen;
 use tower_of_rust::screen_update::MapElementUpdate;
 use tower_of_rust::screen_update::ScreenUpdate;
-use tower_of_rust::types::FieldElementPosition;
-
-//
-// Reducers
-//
-
-fn move_operation_target(game: &Game, field: &mut Field, to: &FieldElementPosition) {
-    match &game.operation_target {
-        Some(operation_target) => field.move_field_object(operation_target, to),
-        None => {
-            panic!("There is no operation target.");
-        },
-    };
-}
+use tower_of_rust::unit_of_works::*;
 
 //
 // Controller
