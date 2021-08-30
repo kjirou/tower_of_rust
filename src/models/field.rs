@@ -1,7 +1,7 @@
 use crate::models::field_object::DisplayKind;
 use crate::models::field_object::FieldObject;
-use crate::types::FieldElementPosition;
-use crate::types::FieldObjectPosition;
+use crate::types::{FieldElementPosition, FieldObjectPosition};
+use crate::utils;
 
 #[derive(Debug)]
 pub struct FieldElement {
@@ -53,11 +53,6 @@ pub struct FieldSizeData {
     width: usize,
 }
 
-// TODO: utils みたいなのへ移動する。
-pub fn xyi_to_xy(xyi: &FieldObjectPosition) -> FieldElementPosition {
-    (xyi.0, xyi.1)
-}
-
 #[derive(Debug)]
 pub struct Field {
     matrix: Vec<Vec<FieldElement>>,
@@ -88,7 +83,7 @@ impl Field {
         self.matrix[xy.1][xy.0].append_field_object(field_object);
     }
     pub fn move_field_object(&mut self, from: &FieldObjectPosition, to: &FieldElementPosition) {
-        if &xyi_to_xy(from) == to {
+        if &utils::xyi_to_xy(from) == to {
             panic!("Can not move to the same place.");
         }
         let from_field_element_pointer: *mut FieldElement = &mut self.matrix[from.1][from.0];
