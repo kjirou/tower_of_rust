@@ -4,6 +4,9 @@ use crate::models::game::Game;
 use crate::unit_of_works::*;
 use crate::utils::*;
 
+pub fn advance_only_time() {
+}
+
 // TODO: enum の引数って通常は参照で受け取るべき？
 pub fn move_hero(field: &mut Field, game: &mut Game, direction: FourDirection) {
     match &game.operation_target {

@@ -68,10 +68,10 @@ fn main() {
                             Key::Right | Key::Char('l') => move_hero(&mut field, &mut game, FourDirection::Right),
                             Key::Down | Key::Char('k') => move_hero(&mut field, &mut game, FourDirection::Down),
                             Key::Left | Key::Char('h') => move_hero(&mut field, &mut game, FourDirection::Left),
-                            _ => {},
+                            _ => advance_only_time(),
                         };
                     },
-                    Err(_) => {},
+                    Err(_) => advance_only_time(),
                 };
 
                 // Purge extra key inputs in the same frame.
