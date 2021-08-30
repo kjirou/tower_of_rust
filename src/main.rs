@@ -11,13 +11,7 @@ use termion::{clear, cursor, style};
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
-use tower_of_rust::actions::*;
-use tower_of_rust::enums::FourDirection;
-use tower_of_rust::models::field::Field;
-use tower_of_rust::models::field_object::FieldObject;
-use tower_of_rust::models::game::Game;
-use tower_of_rust::screen::Screen;
-use tower_of_rust::screen_update_builder;
+use tower_of_rust::controller::Controller;
 
 fn main() {
     let command_args = App::new("A Tower of Rust")
@@ -29,19 +23,10 @@ fn main() {
         )
         .get_matches();
 
-    let mut game = Game {
-        operation_target: None,
-    };
-    let mut field = Field::new(120, 36);
-    field.surround_with_walls();
-    field.place_field_object(&(2, 2), FieldObject::new_hero(String::from("player")));
-    game.operation_target = Some((2, 2, String::from("player")));
-
-    let mut screen = Screen::new();
-    screen.update(&screen_update_builder::build(&field));
+    let mut controller = Controller::new();
     
     if command_args.is_present("debug") {
-        let output = screen.create_output_as_lines().join("\n");
+        let output = controller.create_screen_output_as_lines().join("\n");
         println!("{}", output);
     } else {
         let (tx, rx) = mpsc::channel::<Key>();
@@ -56,30 +41,33 @@ fn main() {
             stdout.flush().unwrap();
 
             loop {
-                match rx.try_recv() {
-                    Ok(key_input) => {
-                        // TODO: For debug.
-                        print!("{:?}", key_input);
-                        match key_input {
-                            Key::Esc | Key::Ctrl('c') | Key::Char('q') => {
-                                break;
-                            },
-                            Key::Up | Key::Char('j') => move_hero(&mut field, &mut game, FourDirection::Up),
-                            Key::Right | Key::Char('l') => move_hero(&mut field, &mut game, FourDirection::Right),
-                            Key::Down | Key::Char('k') => move_hero(&mut field, &mut game, FourDirection::Down),
-                            Key::Left | Key::Char('h') => move_hero(&mut field, &mut game, FourDirection::Left),
-                            _ => advance_only_time(),
-                        };
-                    },
-                    Err(_) => advance_only_time(),
+                let key_input = match rx.try_recv() {
+                    Ok(key_input) => Some(key_input),
+                    Err(_) => None,
                 };
 
                 // Purge extra key inputs in the same frame.
                 while rx.try_recv().is_err() == false {};
 
-                screen.update(&screen_update_builder::build(&field));
+                // Quit this application. Only this operation is resolved with priority.
+                match key_input {
+                    Some(key_input) => {
+                        match key_input {
+                            Key::Esc | Key::Ctrl('c') | Key::Char('q') => break,
+                            _ => {},
+                        }
+                    },
+                    _ => {},
+                };
 
-                for (i, line) in screen.create_output_as_lines().iter().enumerate() {
+                // TODO: For debug.
+                if let Some(key_input) = key_input {
+                    print!("{:?}", key_input);
+                }
+
+                controller.handle_main_roop(key_input);
+
+                for (i, line) in controller.create_screen_output_as_lines().iter().enumerate() {
                     write!(stdout, "{}{}", cursor::Goto(1, i as u16 + 1), line).unwrap();
                 }
                 stdout.flush().unwrap();
@@ -95,6 +83,7 @@ fn main() {
         for key_input in stdin.keys() {
             let key_input = key_input.unwrap();
             match key_input {
+                // Quit this application.
                 Key::Esc | Key::Ctrl('c') | Key::Char('q') => {
                     tx.send(key_input).unwrap();
                     break;
