@@ -11,12 +11,13 @@ use termion::{clear, cursor, style};
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
+use tower_of_rust::actions::*;
+use tower_of_rust::enums::FourDirection;
 use tower_of_rust::models::field::Field;
 use tower_of_rust::models::field_object::FieldObject;
 use tower_of_rust::models::game::Game;
 use tower_of_rust::screen::Screen;
 use tower_of_rust::screen_update_builder;
-use tower_of_rust::unit_of_works::*;
 
 fn main() {
     let command_args = App::new("A Tower of Rust")
@@ -35,7 +36,6 @@ fn main() {
     field.surround_with_walls();
     field.place_field_object(&(2, 2), FieldObject::new_hero(String::from("player")));
     game.operation_target = Some((2, 2, String::from("player")));
-    move_operation_target(&game, &mut field, &(2, 3));
 
     let mut screen = Screen::new();
     screen.update(&screen_update_builder::build(&field));
@@ -64,6 +64,10 @@ fn main() {
                             Key::Esc | Key::Ctrl('c') | Key::Char('q') => {
                                 break;
                             },
+                            Key::Up | Key::Char('j') => move_hero(&mut field, &mut game, FourDirection::Up),
+                            Key::Right | Key::Char('l') => move_hero(&mut field, &mut game, FourDirection::Right),
+                            Key::Down | Key::Char('k') => move_hero(&mut field, &mut game, FourDirection::Down),
+                            Key::Left | Key::Char('h') => move_hero(&mut field, &mut game, FourDirection::Left),
                             _ => {},
                         };
                     },
@@ -94,6 +98,9 @@ fn main() {
                 Key::Esc | Key::Ctrl('c') | Key::Char('q') => {
                     tx.send(key_input).unwrap();
                     break;
+                },
+                Key::Up | Key::Right | Key::Down | Key::Left => {
+                    tx.send(key_input).unwrap();
                 },
                 Key::Char(key_input) => tx.send(Key::Char(key_input)).unwrap(),
                 _ => {},

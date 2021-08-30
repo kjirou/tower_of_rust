@@ -53,8 +53,9 @@ pub struct FieldSizeData {
     width: usize,
 }
 
+// TODO: utils みたいなのへ移動する。
 pub fn xyi_to_xy(xyi: &FieldObjectPosition) -> FieldElementPosition {
-    (xyi.1, xyi.0)
+    (xyi.0, xyi.1)
 }
 
 #[derive(Debug)]
