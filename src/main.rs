@@ -11,35 +11,13 @@ use termion::{clear, cursor, style};
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
+use tower_of_rust::actions::*;
+use tower_of_rust::enums::FourDirection;
 use tower_of_rust::models::field::Field;
+use tower_of_rust::models::field_object::FieldObject;
+use tower_of_rust::models::game::Game;
 use tower_of_rust::screen::Screen;
-use tower_of_rust::screen_update::MapElementUpdate;
-use tower_of_rust::screen_update::ScreenUpdate;
-
-fn create_screen_update(field: &Field) -> ScreenUpdate {
-    let map_size = (21, 13);  // width, height
-    let mut map: Vec<Vec<MapElementUpdate>> = vec![];
-
-    for map_y in 0..map_size.1 {
-        let mut map_row: Vec<MapElementUpdate> = vec![];
-        for map_x in 0..map_size.0 {
-            // TODO: Hero 表示位置が常に Map 中央になるように調整する。
-            // TODO: Field の範囲を超えた時に、何かで埋める。
-            let field_element = &field.matrix[map_y][map_x];
-            let symbol = field_element.get_display();
-            map_row.push(MapElementUpdate {
-                symbol,
-                foreground: String::from(""),
-                background: String::from(""),
-            });
-        }
-        map.push(map_row);
-    }
-
-    ScreenUpdate {
-        map,
-    }
-}
+use tower_of_rust::screen_update_builder;
 
 fn main() {
     let command_args = App::new("A Tower of Rust")
@@ -51,11 +29,16 @@ fn main() {
         )
         .get_matches();
 
+    let mut game = Game {
+        operation_target: None,
+    };
     let mut field = Field::new(120, 36);
     field.surround_with_walls();
+    field.place_field_object(&(2, 2), FieldObject::new_hero(String::from("player")));
+    game.operation_target = Some((2, 2, String::from("player")));
 
     let mut screen = Screen::new();
-    screen.update(&create_screen_update(&field));
+    screen.update(&screen_update_builder::build(&field));
     
     if command_args.is_present("debug") {
         let output = screen.create_output_as_lines().join("\n");
@@ -81,6 +64,10 @@ fn main() {
                             Key::Esc | Key::Ctrl('c') | Key::Char('q') => {
                                 break;
                             },
+                            Key::Up | Key::Char('j') => move_hero(&mut field, &mut game, FourDirection::Up),
+                            Key::Right | Key::Char('l') => move_hero(&mut field, &mut game, FourDirection::Right),
+                            Key::Down | Key::Char('k') => move_hero(&mut field, &mut game, FourDirection::Down),
+                            Key::Left | Key::Char('h') => move_hero(&mut field, &mut game, FourDirection::Left),
                             _ => {},
                         };
                     },
@@ -90,7 +77,7 @@ fn main() {
                 // Purge extra key inputs in the same frame.
                 while rx.try_recv().is_err() == false {};
 
-                screen.update(&create_screen_update(&field));
+                screen.update(&screen_update_builder::build(&field));
 
                 for (i, line) in screen.create_output_as_lines().iter().enumerate() {
                     write!(stdout, "{}{}", cursor::Goto(1, i as u16 + 1), line).unwrap();
@@ -111,6 +98,9 @@ fn main() {
                 Key::Esc | Key::Ctrl('c') | Key::Char('q') => {
                     tx.send(key_input).unwrap();
                     break;
+                },
+                Key::Up | Key::Right | Key::Down | Key::Left => {
+                    tx.send(key_input).unwrap();
                 },
                 Key::Char(key_input) => tx.send(Key::Char(key_input)).unwrap(),
                 _ => {},
