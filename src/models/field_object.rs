@@ -8,7 +8,7 @@ pub enum DisplayKind {
 pub struct FieldObject {
     pub display_kind: DisplayKind,
     pub id: String,
-    is_obstacle: bool,
+    pub is_obstacle: bool,
 }
 
 impl FieldObject {

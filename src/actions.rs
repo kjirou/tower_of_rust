@@ -13,8 +13,10 @@ pub fn move_hero(field: &mut Field, game: &mut Game, direction: FourDirection) {
         Some(operation_target) => {
             match translate_position_by_direction(&xyi_to_xy(operation_target), direction) {
                 Ok(position) => {
-                    move_operation_target(field, game, &position);
-                    // TODO: 障害物との衝突判定。
+                    let destination = field.get_field_element(&position);
+                    if !destination.is_impassable() {
+                        move_operation_target(field, game, &position);
+                    }
                 },
                 Err(_) => {},
             };
