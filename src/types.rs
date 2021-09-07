@@ -1,3 +1,6 @@
+// (width, height)
+pub type RectangleSize = (u32, u32);
+
 // (x, y)
 pub type FieldElementPosition = (usize, usize);
 

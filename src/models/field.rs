@@ -1,6 +1,6 @@
 use crate::models::field_element::FieldElement;
 use crate::models::field_object::FieldObject;
-use crate::types::{FieldElementPosition, FieldObjectPosition};
+use crate::types::{FieldElementPosition, FieldObjectPosition, RectangleSize};
 use crate::utils;
 
 pub struct FieldSizeData {
@@ -31,6 +31,10 @@ impl Field {
             max_x: width - 1,
             max_y: height - 1,
         }
+    }
+    pub fn get_rectangle_size(&self) -> RectangleSize {
+        let field_size_data = self.get_size_data();
+        (field_size_data.width as u32, field_size_data.height as u32)
     }
     pub fn get_field_element(&self, xy: &FieldElementPosition) -> &FieldElement {
         &self.matrix[xy.1][xy.0]

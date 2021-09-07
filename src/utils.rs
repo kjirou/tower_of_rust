@@ -1,6 +1,6 @@
 use crate::enums::FourDirection;
 use crate::enums::CustomErrorKind;
-use crate::types::{FieldElementPosition, FieldObjectPosition};
+use crate::types::{FieldElementPosition, FieldObjectPosition, RectangleSize};
 
 // TODO: Err(error) でエラー種別の判定をしたくて作った。一般的に Rust でどうするのか不明。
 #[derive(Debug)]
@@ -83,9 +83,8 @@ mod tests_of_translate_coordinate {
     }
 }
 
-// TODO: 最大のxyを指定できるようにする。
 pub fn translate_position_by_direction(
-    start: &FieldElementPosition, direction: FourDirection
+    field_size: &RectangleSize, start: &FieldElementPosition, direction: FourDirection
 ) -> Result<FieldElementPosition, CustomError> {
     let vector: (i32, i32) = match direction {
         FourDirection::Up => (0, -1),
@@ -94,7 +93,10 @@ pub fn translate_position_by_direction(
         FourDirection::Left => (-1, 0),
     };
     let moved = translate_coordinate(&(start.0 as i32, start.1 as i32), &vector);
-    if moved.0 < 0 || moved.1 < 0 {
+    if moved.0 < 0 ||
+        moved.1 < 0 ||
+        moved.0 >= field_size.0 as i32 ||
+        moved.1 >= field_size.1 as i32 {
         return Err(CustomError {
             kind: CustomErrorKind::CoordinateIsOutsideOfPosition,
         });
@@ -110,7 +112,7 @@ mod tests_of_translate_position_by_direction {
         use super::*;
 
         struct TestCase<'a> {
-            args: (&'a (usize, usize), FourDirection),
+            args: (&'a RectangleSize, &'a FieldElementPosition, FourDirection),
             expected: (usize, usize),
         }
 
@@ -118,25 +120,25 @@ mod tests_of_translate_position_by_direction {
         fn it_works() {
             let table: Vec::<TestCase> = vec![
                 TestCase {
-                    args: (&(1, 2), FourDirection::Up),
+                    args: (&(99, 99), &(1, 2), FourDirection::Up),
                     expected: (1, 1),
                 },
                 TestCase {
-                    args: (&(1, 2), FourDirection::Right),
+                    args: (&(99, 99), &(1, 2), FourDirection::Right),
                     expected: (2, 2),
                 },
                 TestCase {
-                    args: (&(1, 2), FourDirection::Down),
+                    args: (&(99, 99), &(1, 2), FourDirection::Down),
                     expected: (1, 3),
                 },
                 TestCase {
-                    args: (&(1, 2), FourDirection::Left),
+                    args: (&(99, 99), &(1, 2), FourDirection::Left),
                     expected: (0, 2),
                 },
             ];
             for test_case in table {
                 assert_eq!(
-                    translate_position_by_direction(test_case.args.0, test_case.args.1).unwrap(),
+                    translate_position_by_direction(test_case.args.0, test_case.args.1, test_case.args.2).unwrap(),
                     test_case.expected,
                 );
             }
@@ -147,22 +149,28 @@ mod tests_of_translate_position_by_direction {
         use super::*;
 
         struct TestCase<'a> {
-            args: (&'a (usize, usize), FourDirection),
+            args: (&'a RectangleSize, &'a FieldElementPosition, FourDirection),
         }
 
         #[test]
         fn it_works() {
             let table: Vec::<TestCase> = vec![
                 TestCase {
-                    args: (&(1, 0), FourDirection::Up),
+                    args: (&(99, 99), &(1, 0), FourDirection::Up),
                 },
                 TestCase {
-                    args: (&(0, 1), FourDirection::Left),
+                    args: (&(99, 99), &(0, 1), FourDirection::Left),
+                },
+                TestCase {
+                    args: (&(20, 10), &(20, 0), FourDirection::Right),
+                },
+                TestCase {
+                    args: (&(20, 10), &(0, 10), FourDirection::Down),
                 },
             ];
             for test_case in table {
                 assert_eq!(
-                    translate_position_by_direction(test_case.args.0, test_case.args.1).unwrap_err().kind,
+                    translate_position_by_direction(test_case.args.0, test_case.args.1, test_case.args.2).unwrap_err().kind,
                     CustomErrorKind::CoordinateIsOutsideOfPosition,
                 );
             }
