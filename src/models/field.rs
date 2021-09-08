@@ -1,6 +1,6 @@
 use crate::models::field_element::FieldElement;
 use crate::models::field_object::FieldObject;
-use crate::types::{FieldElementPosition, FieldObjectPosition, RectangleSize};
+use crate::types::{FieldElementPosition, FieldObjectLocation, RectangleSize};
 use crate::utils;
 
 pub struct FieldSizeData {
@@ -43,7 +43,7 @@ impl Field {
     pub fn place_field_object(&mut self, xy: &FieldElementPosition, field_object: FieldObject) {
         self.matrix[xy.1][xy.0].append_field_object(field_object);
     }
-    pub fn move_field_object(&mut self, from: &FieldObjectPosition, to: &FieldElementPosition) {
+    pub fn move_field_object(&mut self, from: &FieldObjectLocation, to: &FieldElementPosition) {
         if &utils::xyi_to_xy(from) == to {
             panic!("Can not move to the same place.");
         }

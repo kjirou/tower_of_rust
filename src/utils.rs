@@ -1,6 +1,6 @@
 use crate::enums::FourDirection;
 use crate::enums::CustomErrorKind;
-use crate::types::{FieldElementPosition, FieldObjectPosition, RectangleSize};
+use crate::types::{FieldElementPosition, FieldObjectLocation, RectangleSize};
 
 // TODO: Err(error) でエラー種別の判定をしたくて作った。一般的に Rust でどうするのか不明。
 #[derive(Debug)]
@@ -8,7 +8,7 @@ pub struct CustomError {
     pub kind: CustomErrorKind,
 }
 
-pub fn xyi_to_xy(xyi: &FieldObjectPosition) -> FieldElementPosition {
+pub fn xyi_to_xy(xyi: &FieldObjectLocation) -> FieldElementPosition {
     (xyi.0, xyi.1)
 }
 
@@ -17,7 +17,7 @@ mod tests_of_xyi_to_xy {
     use super::*;
 
     struct TestCase {
-        args: (FieldObjectPosition,),
+        args: (FieldObjectLocation,),
         expected: FieldElementPosition,
     }
 
