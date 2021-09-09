@@ -28,7 +28,7 @@ impl Controller {
             None => advance_only_time(),
         };
 
-        let screen_update = screen_update_builder::build(&self.field);
+        let screen_update = screen_update_builder::build(&self.field, &self.game);
         self.screen.update(&screen_update);
     }
     pub fn create_screen_output_as_lines(&self) -> Vec<String> {
@@ -45,7 +45,7 @@ impl Controller {
         game.operation_target = Some((2, 2, String::from("player")));
 
         let mut screen = Screen::new();
-        screen.update(&screen_update_builder::build(&field));
+        screen.update(&screen_update_builder::build(&field, &game));
 
         Controller {
             field,

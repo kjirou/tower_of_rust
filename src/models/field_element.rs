@@ -32,9 +32,6 @@ impl FieldElement {
     pub fn append_field_object(&mut self, field_object: FieldObject) {
         self.field_objects.push(field_object);
     }
-    // fn find_field_object(&self, id: &str) -> Option<&FieldObject> {
-    //     self.field_objects.iter().find(|&e| e.id == id)
-    // }
     fn remove_field_object(&mut self, id: &str) -> FieldObject {
         let index = self.field_objects.iter().position(|e| e.id == id);
         match index {
