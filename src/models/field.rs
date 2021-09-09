@@ -47,7 +47,7 @@ impl Field {
         self.matrix[position.1 as usize][position.0 as usize].append_field_object(field_object);
     }
     pub fn move_field_object(&mut self, from: &FieldObjectLocation, to: &FieldElementPosition) {
-        if &utils::xyi_to_xy(from) == to {
+        if &utils::fol_to_fep(from) == to {
             panic!("Can not move to the same place.");
         }
         let from_field_element_pointer: *mut FieldElement = &mut self.matrix[from.1 as usize][from.0 as usize];

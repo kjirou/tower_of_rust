@@ -8,13 +8,12 @@ pub struct CustomError {
     pub kind: CustomErrorKind,
 }
 
-// TODO: fol_to_fep とかの方がまだ良さそう。
-pub fn xyi_to_xy(xyi: &FieldObjectLocation) -> FieldElementPosition {
-    (xyi.0, xyi.1)
+pub fn fol_to_fep(location: &FieldObjectLocation) -> FieldElementPosition {
+    (location.0, location.1)
 }
 
 #[cfg(test)]
-mod tests_of_xyi_to_xy {
+mod tests_of_fol_to_fep {
     use super::*;
 
     struct TestCase {
@@ -32,7 +31,7 @@ mod tests_of_xyi_to_xy {
         ];
         for test_case in table {
             assert_eq!(
-                xyi_to_xy(&test_case.args.0),
+                fol_to_fep(&test_case.args.0),
                 test_case.expected,
                 "{:?} => {:?}",
                 test_case.args.0,
