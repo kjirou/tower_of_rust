@@ -177,3 +177,69 @@ mod tests_of_translate_position_by_direction {
         }
     }
 }
+
+pub fn translate_rectangle_on_field(size: &RectangleSize, target_of_interest: &FieldElementPosition) -> (i32, i32) {
+    if size.0 % 2 == 0 || size.1 % 2 == 0 {
+        panic!("The size of the rectangle is odd only.");
+    }
+    let offset = (size.0 / 2, size.1 / 2);
+    (
+        (target_of_interest.0 as i32 - offset.0 as i32),
+        (target_of_interest.1 as i32 - offset.1 as i32),
+    )
+}
+
+#[cfg(test)]
+mod tests_of_translate_rectangle_on_field {
+    use super::*;
+
+    mod when_it_does_not_panic {
+        use super::*;
+
+        struct TestCase<'a> {
+            args: (&'a RectangleSize, &'a FieldElementPosition),
+            expected: (i32, i32),
+        }
+
+        #[test]
+        fn it_works() {
+            let table: Vec::<TestCase> = vec![
+                // X---+
+                // | @-|- (0 ,0) at the field
+                // +---+
+                //   |
+                TestCase {
+                    args: (&(5, 3), &(0, 0)),
+                    expected: (-2, -1),
+                },
+                // +-------
+                // | X---+
+                // | | @ |  (4 ,2) at the field
+                // | +---+
+                // |
+                TestCase {
+                    args: (&(5, 3), &(4, 2)),
+                    expected: (2, 1),
+                },
+            ];
+            for test_case in table {
+                assert_eq!(
+                    translate_rectangle_on_field(test_case.args.0, test_case.args.1),
+                    test_case.expected,
+                );
+            }
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = " is odd only")]
+    fn it_panics_when_the_width_of_the_rectangle_is_even() {
+        translate_rectangle_on_field(&(2, 1), &(0, 0));
+    }
+
+    #[test]
+    #[should_panic(expected = " is odd only")]
+    fn it_panics_when_the_height_of_the_rectangle_is_even() {
+        translate_rectangle_on_field(&(1, 2), &(0, 0));
+    }
+}
