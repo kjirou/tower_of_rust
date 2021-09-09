@@ -1,6 +1,6 @@
 use crate::enums::FourDirection;
 use crate::enums::CustomErrorKind;
-use crate::types::{FieldElementPosition, FieldObjectLocation, RectangleSize};
+use crate::types::{FieldElementPosition, FieldObjectLocation, RectangleSize, XYCoordinates, XYVector};
 
 // TODO: Err(error) でエラー種別の判定をしたくて作った。一般的に Rust でどうするのか不明。
 #[derive(Debug)]
@@ -41,7 +41,7 @@ mod tests_of_xyi_to_xy {
     }
 }
 
-pub fn translate_coordinate(start: &(i32, i32), vector: &(i32, i32)) -> (i32, i32) {
+pub fn translate_coordinate(start: &XYCoordinates, vector: &XYVector) -> XYCoordinates {
     (start.0 + vector.0, start.1 + vector.1)
 }
 
@@ -50,8 +50,8 @@ mod tests_of_translate_coordinate {
     use super::*;
 
     struct TestCase<'a> {
-        args: (&'a (i32, i32), &'a (i32, i32)),
-        expected: (i32, i32),
+        args: (&'a XYCoordinates, &'a XYVector),
+        expected: XYCoordinates,
     }
 
     #[test]
@@ -86,7 +86,7 @@ mod tests_of_translate_coordinate {
 pub fn translate_position_by_direction(
     field_size: &RectangleSize, start: &FieldElementPosition, direction: FourDirection
 ) -> Result<FieldElementPosition, CustomError> {
-    let vector: (i32, i32) = match direction {
+    let vector: XYVector = match direction {
         FourDirection::Up => (0, -1),
         FourDirection::Right => (1, 0),
         FourDirection::Down => (0, 1),
@@ -178,7 +178,7 @@ mod tests_of_translate_position_by_direction {
     }
 }
 
-pub fn translate_rectangle_on_field(size: &RectangleSize, target_of_interest: &FieldElementPosition) -> (i32, i32) {
+pub fn translate_rectangle_on_field(size: &RectangleSize, target_of_interest: &FieldElementPosition) -> XYCoordinates {
     if size.0 % 2 == 0 || size.1 % 2 == 0 {
         panic!("The size of the rectangle is odd only.");
     }

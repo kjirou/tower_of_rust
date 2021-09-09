@@ -1,6 +1,12 @@
 /// (width, height)
 pub type RectangleSize = (u32, u32);
 
+/// (x, y)
+pub type XYCoordinates = (i32, i32);
+
+/// (x, y)
+pub type XYVector = (i32, i32);
+
 /// A (x, y) coordinates of a `FieldElement`.
 pub type FieldElementPosition = (usize, usize);
 
