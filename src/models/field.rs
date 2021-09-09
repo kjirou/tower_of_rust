@@ -32,26 +32,26 @@ impl Field {
         self.get_size_data().size
     }
     pub fn get_field_element(&self, position: &FieldElementPosition) -> &FieldElement {
-        &self.matrix[position.1][position.0]
+        &self.matrix[position.1 as usize][position.0 as usize]
     }
     pub fn find_field_element_by_xy(&self, xy: &XYCoordinates) -> Option<&FieldElement> {
         let field_size_data = self.get_size_data();
         if xy.0 >= 0 && xy.0 <= field_size_data.max_xy.0 &&
             xy.1 >= 0 && xy.1 <= field_size_data.max_xy.1 {
-            return Some(self.get_field_element(&(xy.0 as usize, xy.1 as usize)));
+            return Some(self.get_field_element(&(xy.0 as u32, xy.1 as u32)));
         }
         None
     }
     // TODO: field_objet の id を重複して発行しない。他の処理は id は重複してない前提にする。
     pub fn place_field_object(&mut self, position: &FieldElementPosition, field_object: FieldObject) {
-        self.matrix[position.1][position.0].append_field_object(field_object);
+        self.matrix[position.1 as usize][position.0 as usize].append_field_object(field_object);
     }
     pub fn move_field_object(&mut self, from: &FieldObjectLocation, to: &FieldElementPosition) {
         if &utils::xyi_to_xy(from) == to {
             panic!("Can not move to the same place.");
         }
-        let from_field_element_pointer: *mut FieldElement = &mut self.matrix[from.1][from.0];
-        let to_field_element_pointer: *mut FieldElement = &mut self.matrix[to.1][to.0];
+        let from_field_element_pointer: *mut FieldElement = &mut self.matrix[from.1 as usize][from.0 as usize];
+        let to_field_element_pointer: *mut FieldElement = &mut self.matrix[to.1 as usize][to.0 as usize];
         unsafe {
             let from_field_element = &mut *from_field_element_pointer;
             let to_field_element = &mut *to_field_element_pointer;
@@ -65,7 +65,7 @@ impl Field {
                 if y == 0 || y == field_size_data.max_xy.1 as u32 || x == 0 || x == field_size_data.max_xy.0 as u32 {
                     // TODO: id の値が雑。
                     let id = format!("wall-{}-{}", x, y);
-                    self.place_field_object(&(x as usize, y as usize), FieldObject::new_wall(id))
+                    self.place_field_object(&(x, y), FieldObject::new_wall(id))
                 }
             }
         }
@@ -77,8 +77,7 @@ impl Field {
             let mut row: Vec<FieldElement> = Vec::new();
             for x in 0..width {
                 row.push(FieldElement {
-                    y,
-                    x,
+                    position: (x as u32, y as u32),
                     field_objects: Vec::new(),
                 });
             }

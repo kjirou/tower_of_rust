@@ -5,13 +5,12 @@ use crate::types::FieldElementPosition;
 #[derive(Debug, Default)]
 pub struct FieldElement {
     pub field_objects: Vec<FieldObject>,
-    pub x: usize,
-    pub y: usize,
+    pub position: FieldElementPosition,
 }
 
 impl FieldElement {
     pub fn get_position(&self) -> FieldElementPosition {
-        (self.x, self.y)
+        self.position.clone()
     }
     pub fn is_impassable(&self) -> bool {
         self.field_objects.iter().any(|e| e.is_obstacle)

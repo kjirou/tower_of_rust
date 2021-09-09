@@ -102,7 +102,7 @@ pub fn translate_position_by_direction(
             kind: CustomErrorKind::CoordinateIsOutsideOfPosition,
         });
     }
-    Ok((moved.0 as usize, moved.1 as usize))
+    Ok((moved.0 as u32, moved.1 as u32))
 }
 
 #[cfg(test)]
@@ -114,7 +114,7 @@ mod tests_of_translate_position_by_direction {
 
         struct TestCase<'a> {
             args: (&'a RectangleSize, &'a FieldElementPosition, FourDirection),
-            expected: (usize, usize),
+            expected: FieldElementPosition,
         }
 
         #[test]
