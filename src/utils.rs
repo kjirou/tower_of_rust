@@ -50,8 +50,8 @@ pub fn translate_coordinate(start: &XYCoordinates, vector: &XYVector) -> XYCoord
 mod tests_of_translate_coordinate {
     use super::*;
 
-    struct TestCase<'a> {
-        args: (&'a XYCoordinates, &'a XYVector),
+    struct TestCase {
+        args: (XYCoordinates, XYVector),
         expected: XYCoordinates,
     }
 
@@ -59,21 +59,21 @@ mod tests_of_translate_coordinate {
     fn it_works() {
         let table: Vec::<TestCase> = vec![
             TestCase {
-                args: (&(1, 2), &(10, 20)),
+                args: ((1, 2), (10, 20)),
                 expected: (11, 22),
             },
             TestCase {
-                args: (&(1, 2), &(-10, -20)),
+                args: ((1, 2), (-10, -20)),
                 expected: (-9, -18),
             },
             TestCase {
-                args: (&(1, 2), &(0, 0)),
+                args: ((1, 2), (0, 0)),
                 expected: (1, 2),
             },
         ];
         for test_case in table {
             assert_eq!(
-                translate_coordinate(test_case.args.0, test_case.args.1),
+                translate_coordinate(&test_case.args.0, &test_case.args.1),
                 test_case.expected,
                 "{:?} + {:?} => {:?}",
                 test_case.args.0,
@@ -112,8 +112,8 @@ mod tests_of_translate_position_by_direction {
     mod when_it_returns_ok {
         use super::*;
 
-        struct TestCase<'a> {
-            args: (&'a RectangleSize, &'a FieldElementPosition, FourDirection),
+        struct TestCase {
+            args: (RectangleSize, FieldElementPosition, FourDirection),
             expected: FieldElementPosition,
         }
 
@@ -121,25 +121,25 @@ mod tests_of_translate_position_by_direction {
         fn it_works() {
             let table: Vec::<TestCase> = vec![
                 TestCase {
-                    args: (&(99, 99), &(1, 2), FourDirection::Up),
+                    args: ((99, 99), (1, 2), FourDirection::Up),
                     expected: (1, 1),
                 },
                 TestCase {
-                    args: (&(99, 99), &(1, 2), FourDirection::Right),
+                    args: ((99, 99), (1, 2), FourDirection::Right),
                     expected: (2, 2),
                 },
                 TestCase {
-                    args: (&(99, 99), &(1, 2), FourDirection::Down),
+                    args: ((99, 99), (1, 2), FourDirection::Down),
                     expected: (1, 3),
                 },
                 TestCase {
-                    args: (&(99, 99), &(1, 2), FourDirection::Left),
+                    args: ((99, 99), (1, 2), FourDirection::Left),
                     expected: (0, 2),
                 },
             ];
             for test_case in table {
                 assert_eq!(
-                    translate_position_by_direction(test_case.args.0, test_case.args.1, test_case.args.2).unwrap(),
+                    translate_position_by_direction(&test_case.args.0, &test_case.args.1, test_case.args.2).unwrap(),
                     test_case.expected,
                 );
             }
