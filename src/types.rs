@@ -8,6 +8,7 @@ pub type XYCoordinates = (i32, i32);
 pub type XYVector = (i32, i32);
 
 /// A (x, y) coordinates of a `FieldElement`.
+// TODO: usize じゃなくて u32 にする。
 pub type FieldElementPosition = (usize, usize);
 
 /// A location of a `FieldObject`.

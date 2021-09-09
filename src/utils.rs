@@ -8,6 +8,7 @@ pub struct CustomError {
     pub kind: CustomErrorKind,
 }
 
+// TODO: fol_to_fep とかの方がまだ良さそう。
 pub fn xyi_to_xy(xyi: &FieldObjectLocation) -> FieldElementPosition {
     (xyi.0, xyi.1)
 }
