@@ -35,7 +35,7 @@ impl Controller {
         self.screen.create_output_as_lines()
     }
     pub fn new() -> Controller {
-        let mut field = Field::new(120, 36);
+        let mut field = Field::new(&(120, 36));
         field.surround_with_walls();
         field.place_field_object(&(2, 2), FieldObject::new_hero(String::from("player")));
 

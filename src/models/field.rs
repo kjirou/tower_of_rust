@@ -70,14 +70,13 @@ impl Field {
             }
         }
     }
-    // TODO: 引数は RectangleSize にする。
-    pub fn new(width: usize, height: usize) -> Field {
+    pub fn new(size: &RectangleSize) -> Field {
         let mut matrix: Vec<Vec<FieldElement>> = Vec::new();
-        for y in 0..height {
+        for y in 0..size.1 {
             let mut row: Vec<FieldElement> = Vec::new();
-            for x in 0..width {
+            for x in 0..size.0 {
                 row.push(FieldElement {
-                    position: (x as u32, y as u32),
+                    position: (x, y),
                     field_objects: Vec::new(),
                 });
             }
@@ -109,17 +108,17 @@ mod tests {
             fn it_works() {
                 let table = vec![
                     TestCase {
-                        instance: Field::new(6, 4),
+                        instance: Field::new(&(6, 4)),
                         args: ((0, 0),),
                         expected: ((0, 0)),
                     },
                     TestCase {
-                        instance: Field::new(6, 4),
+                        instance: Field::new(&(6, 4)),
                         args: ((5, 0),),
                         expected: ((5, 0)),
                     },
                     TestCase {
-                        instance: Field::new(6, 4),
+                        instance: Field::new(&(6, 4)),
                         args: ((0, 3),),
                         expected: ((0, 3)),
                     },
@@ -145,19 +144,19 @@ mod tests {
             fn it_works() {
                 let table = vec![
                     TestCase {
-                        instance: Field::new(6, 4),
+                        instance: Field::new(&(6, 4)),
                         args: ((-1, 0),),
                     },
                     TestCase {
-                        instance: Field::new(6, 4),
+                        instance: Field::new(&(6, 4)),
                         args: ((0, -1),),
                     },
                     TestCase {
-                        instance: Field::new(6, 4),
+                        instance: Field::new(&(6, 4)),
                         args: ((6, 0),),
                     },
                     TestCase {
-                        instance: Field::new(6, 4),
+                        instance: Field::new(&(6, 4)),
                         args: ((0, 4),),
                     },
                 ];
