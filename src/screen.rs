@@ -471,13 +471,9 @@ impl Screen {
         };
 
         // Assign the initial data.
-        //let max_row_index = (screen.matrix.len() - 1) as u8;
-        // TODO: as u8 をこの row_index へ実行したい。下記 column_index も同様。
         for row_index in 0..screen.matrix.len() {
             let row = &screen.matrix[row_index];
-            //let max_column_index = (row.len() - 1) as u8;
             for column_index in 0..row.len() {
-                // TODO: let cell = screen.matrix[row_index][column_index]; みたいに一旦変数に落として更新したい。
                 screen.matrix[row_index][column_index].x = column_index as u8;
                 screen.matrix[row_index][column_index].y = row_index as u8;
             }
