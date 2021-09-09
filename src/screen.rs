@@ -14,9 +14,8 @@ pub struct Cell {
     // TODO: いくつかの ANCI escape code の列挙を設定する。
     pub background: String,
     pub foreground: String,
+    pub position: (u8, u8), // (x, y)
     pub symbol: char,
-    pub x: u8,
-    pub y: u8,
 }
 
 pub struct Screen {
@@ -26,8 +25,7 @@ pub struct Screen {
 impl Screen {
     pub fn new() -> Screen {
         let default_cell = Cell {
-            x: 0,
-            y: 0,
+            position: (0, 0),
             symbol: ' ',
             background: String::from(""),
             foreground: String::from(""),
@@ -471,11 +469,10 @@ impl Screen {
         };
 
         // Assign the initial data.
-        for row_index in 0..screen.matrix.len() {
-            let row = &screen.matrix[row_index];
-            for column_index in 0..row.len() {
-                screen.matrix[row_index][column_index].x = column_index as u8;
-                screen.matrix[row_index][column_index].y = row_index as u8;
+        for y in 0..screen.matrix.len() {
+            let row = &screen.matrix[y];
+            for x in 0..row.len() {
+                screen.matrix[y][x].position = (x as u8, y as u8);
             }
         }
         screen
