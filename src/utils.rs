@@ -8,13 +8,12 @@ pub struct CustomError {
     pub kind: CustomErrorKind,
 }
 
-// TODO: fol_to_fep とかの方がまだ良さそう。
-pub fn xyi_to_xy(xyi: &FieldObjectLocation) -> FieldElementPosition {
-    (xyi.0, xyi.1)
+pub fn fol_to_fep(location: &FieldObjectLocation) -> FieldElementPosition {
+    (location.0, location.1)
 }
 
 #[cfg(test)]
-mod tests_of_xyi_to_xy {
+mod tests_of_fol_to_fep {
     use super::*;
 
     struct TestCase {
@@ -32,7 +31,7 @@ mod tests_of_xyi_to_xy {
         ];
         for test_case in table {
             assert_eq!(
-                xyi_to_xy(&test_case.args.0),
+                fol_to_fep(&test_case.args.0),
                 test_case.expected,
                 "{:?} => {:?}",
                 test_case.args.0,
@@ -50,8 +49,8 @@ pub fn translate_coordinate(start: &XYCoordinates, vector: &XYVector) -> XYCoord
 mod tests_of_translate_coordinate {
     use super::*;
 
-    struct TestCase<'a> {
-        args: (&'a XYCoordinates, &'a XYVector),
+    struct TestCase {
+        args: (XYCoordinates, XYVector),
         expected: XYCoordinates,
     }
 
@@ -59,21 +58,21 @@ mod tests_of_translate_coordinate {
     fn it_works() {
         let table: Vec::<TestCase> = vec![
             TestCase {
-                args: (&(1, 2), &(10, 20)),
+                args: ((1, 2), (10, 20)),
                 expected: (11, 22),
             },
             TestCase {
-                args: (&(1, 2), &(-10, -20)),
+                args: ((1, 2), (-10, -20)),
                 expected: (-9, -18),
             },
             TestCase {
-                args: (&(1, 2), &(0, 0)),
+                args: ((1, 2), (0, 0)),
                 expected: (1, 2),
             },
         ];
         for test_case in table {
             assert_eq!(
-                translate_coordinate(test_case.args.0, test_case.args.1),
+                translate_coordinate(&test_case.args.0, &test_case.args.1),
                 test_case.expected,
                 "{:?} + {:?} => {:?}",
                 test_case.args.0,
@@ -102,7 +101,7 @@ pub fn translate_position_by_direction(
             kind: CustomErrorKind::CoordinateIsOutsideOfPosition,
         });
     }
-    Ok((moved.0 as usize, moved.1 as usize))
+    Ok((moved.0 as u32, moved.1 as u32))
 }
 
 #[cfg(test)]
@@ -112,34 +111,34 @@ mod tests_of_translate_position_by_direction {
     mod when_it_returns_ok {
         use super::*;
 
-        struct TestCase<'a> {
-            args: (&'a RectangleSize, &'a FieldElementPosition, FourDirection),
-            expected: (usize, usize),
+        struct TestCase {
+            args: (RectangleSize, FieldElementPosition, FourDirection),
+            expected: FieldElementPosition,
         }
 
         #[test]
         fn it_works() {
             let table: Vec::<TestCase> = vec![
                 TestCase {
-                    args: (&(99, 99), &(1, 2), FourDirection::Up),
+                    args: ((99, 99), (1, 2), FourDirection::Up),
                     expected: (1, 1),
                 },
                 TestCase {
-                    args: (&(99, 99), &(1, 2), FourDirection::Right),
+                    args: ((99, 99), (1, 2), FourDirection::Right),
                     expected: (2, 2),
                 },
                 TestCase {
-                    args: (&(99, 99), &(1, 2), FourDirection::Down),
+                    args: ((99, 99), (1, 2), FourDirection::Down),
                     expected: (1, 3),
                 },
                 TestCase {
-                    args: (&(99, 99), &(1, 2), FourDirection::Left),
+                    args: ((99, 99), (1, 2), FourDirection::Left),
                     expected: (0, 2),
                 },
             ];
             for test_case in table {
                 assert_eq!(
-                    translate_position_by_direction(test_case.args.0, test_case.args.1, test_case.args.2).unwrap(),
+                    translate_position_by_direction(&test_case.args.0, &test_case.args.1, test_case.args.2).unwrap(),
                     test_case.expected,
                 );
             }
