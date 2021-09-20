@@ -84,7 +84,7 @@ mod tests_of_translate_coordinate {
 }
 
 pub fn translate_position_by_direction(
-    field_size: &RectangleSize, start: &FieldElementPosition, direction: FourDirection
+    field_size: &RectangleSize, start: &FieldElementPosition, direction: &FourDirection
 ) -> Result<FieldElementPosition, CustomError> {
     let vector: XYVector = match direction {
         FourDirection::Up => (0, -1),
@@ -138,7 +138,7 @@ mod tests_of_translate_position_by_direction {
             ];
             for test_case in table {
                 assert_eq!(
-                    translate_position_by_direction(&test_case.args.0, &test_case.args.1, test_case.args.2).unwrap(),
+                    translate_position_by_direction(&test_case.args.0, &test_case.args.1, &test_case.args.2).unwrap(),
                     test_case.expected,
                 );
             }
@@ -170,7 +170,7 @@ mod tests_of_translate_position_by_direction {
             ];
             for test_case in table {
                 assert_eq!(
-                    translate_position_by_direction(test_case.args.0, test_case.args.1, test_case.args.2).unwrap_err().kind,
+                    translate_position_by_direction(test_case.args.0, test_case.args.1, &test_case.args.2).unwrap_err().kind,
                     CustomErrorKind::CoordinateIsOutsideOfPosition,
                 );
             }
