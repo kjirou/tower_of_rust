@@ -2,6 +2,8 @@ use crate::enums::FourDirection;
 use crate::enums::CustomErrorKind;
 use crate::types::{FieldElementPosition, FieldObjectLocation, RectangleSize, XYCoordinates, XYLocation, XYVector};
 
+pub mod rand_utils;
+
 // TODO: Err(error) でエラー種別の判定をしたくて作った。一般的に Rust でどうするのか不明。
 #[derive(Debug)]
 pub struct CustomError {
