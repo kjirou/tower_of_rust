@@ -34,7 +34,7 @@ impl Controller {
     pub fn create_screen_output_as_lines(&self) -> Vec<String> {
         self.screen.create_output_as_lines()
     }
-    pub fn new() -> Controller {
+    pub fn new() -> Self {
         let mut field = Field::new(&(120, 36));
         field.surround_with_walls();
         field.place_field_object(&(2, 2), FieldObject::new_hero(String::from("player")));
@@ -47,7 +47,7 @@ impl Controller {
         let mut screen = Screen::new();
         screen.update(&screen_update_builder::build(&field, &game));
 
-        Controller {
+        Self {
             field,
             game,
             screen,

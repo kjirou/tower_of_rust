@@ -14,7 +14,7 @@ pub struct Screen {
 }
 
 impl Screen {
-    pub fn new() -> Screen {
+    pub fn new() -> Self {
         let default_cell = Cell {
             position: (0, 0),
             symbol: ' ',

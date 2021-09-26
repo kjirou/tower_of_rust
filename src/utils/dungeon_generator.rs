@@ -487,7 +487,7 @@ pub struct Dungeon {
     pub spaces: Vec<DungeonSpace>,
 }
 impl Dungeon {
-    pub fn new(dungeon_size: &RectangleSize, spaces: &Vec<DungeonSpace>, margin_length: u32) -> Dungeon {
+    pub fn new(dungeon_size: &RectangleSize, spaces: &Vec<DungeonSpace>, margin_length: u32) -> Self {
         // Combine margins.
         let new_dungeon_size = (dungeon_size.0 + margin_length * 2, dungeon_size.1 + margin_length * 2);
         let new_spaces: Vec<DungeonSpace> = spaces.iter()
@@ -547,7 +547,7 @@ impl Dungeon {
             }
         }
     
-        Dungeon {
+        Self {
             matrix,
             spaces: new_spaces,
         }

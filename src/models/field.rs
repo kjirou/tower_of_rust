@@ -70,7 +70,7 @@ impl Field {
             }
         }
     }
-    pub fn new(size: &RectangleSize) -> Field {
+    pub fn new(size: &RectangleSize) -> Self {
         let mut matrix: Vec<Vec<FieldElement>> = Vec::new();
         for y in 0..size.1 {
             let mut row: Vec<FieldElement> = Vec::new();
@@ -82,7 +82,7 @@ impl Field {
             }
             matrix.push(row);
         }
-        Field {
+        Self {
             matrix,
         }
     }
