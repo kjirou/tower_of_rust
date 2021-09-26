@@ -1,7 +1,6 @@
 use crate::models::field::Field;
 use crate::models::game::Game;
-use crate::screen::MapElementUpdate;
-use crate::screen::ScreenUpdate;
+use crate::screen_update::{MapElementUpdate, ScreenUpdate};
 use crate::types::{RectangleSize, XYCoordinates};
 use crate::utils::{fol_to_fep, translate_rectangle_on_field};
 
