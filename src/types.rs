@@ -13,6 +13,9 @@ pub type XYCoordinates = (i32, i32);
 /// (x, y)
 pub type XYVector = (i32, i32);
 
+/// (XYCoodinates, RectangleSize)
+pub type XYLocation = (XYCoordinates, RectangleSize);
+
 /// (x, y) coordinates of a `FieldElement`.
 pub type FieldElementPosition = (u32, u32);
 
