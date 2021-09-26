@@ -7,8 +7,7 @@ use crate::utils::*;
 pub fn advance_only_time() {
 }
 
-// TODO: enum の引数って通常は参照で受け取るべき？
-pub fn move_hero(field: &mut Field, game: &mut Game, direction: FourDirection) {
+pub fn move_hero(field: &mut Field, game: &mut Game, direction: &FourDirection) {
     match &game.operation_target {
         Some(operation_target) => {
             match translate_position_by_direction(&field.get_rectangle_size(), &fol_to_fep(operation_target), direction) {
