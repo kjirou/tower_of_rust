@@ -1,15 +1,14 @@
 use crate::models::field::Field;
 use crate::models::game::Game;
-use crate::screen::MapElementUpdate;
-use crate::screen::ScreenUpdate;
+use crate::screen_update::{MapElementUpdate, ScreenUpdate};
 use crate::types::{RectangleSize, XYCoordinates};
-use crate::utils::{fol_to_fep, translate_rectangle_on_field};
+use crate::utils::{translate_rectangle_on_field};
 
 pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
     let map_size: RectangleSize = (21, 13);
     let mut map: Vec<Vec<MapElementUpdate>> = vec![];
     let map_xy: Option<XYCoordinates> = match &game.operation_target {
-        Some(operation_target) => Some(translate_rectangle_on_field(&map_size, &fol_to_fep(&operation_target))),
+        Some(operation_target) => Some(translate_rectangle_on_field(&map_size, &operation_target.0)),
         _ => None,
     };
     for map_y in 0..map_size.1 {

@@ -1,7 +1,6 @@
 use crate::models::field_element::FieldElement;
 use crate::models::field_object::FieldObject;
 use crate::types::{FieldElementPosition, FieldObjectLocation, RectangleSize, XYCoordinates};
-use crate::utils;
 
 pub struct FieldSizeData {
     max_xy: XYCoordinates,
@@ -47,15 +46,15 @@ impl Field {
         self.matrix[position.1 as usize][position.0 as usize].append_field_object(field_object);
     }
     pub fn move_field_object(&mut self, from: &FieldObjectLocation, to: &FieldElementPosition) {
-        if &utils::fol_to_fep(from) == to {
+        if &from.0 == to {
             panic!("Can not move to the same place.");
         }
-        let from_field_element_pointer: *mut FieldElement = &mut self.matrix[from.1 as usize][from.0 as usize];
+        let from_field_element_pointer: *mut FieldElement = &mut self.matrix[from.0.1 as usize][from.0.0 as usize];
         let to_field_element_pointer: *mut FieldElement = &mut self.matrix[to.1 as usize][to.0 as usize];
         unsafe {
             let from_field_element = &mut *from_field_element_pointer;
             let to_field_element = &mut *to_field_element_pointer;
-            from_field_element.move_field_object_to_another(&from.2, to_field_element);
+            from_field_element.move_field_object_to_another(&from.1, to_field_element);
         }
     }
     pub fn surround_with_walls(&mut self) {
@@ -70,7 +69,7 @@ impl Field {
             }
         }
     }
-    pub fn new(size: &RectangleSize) -> Field {
+    pub fn new(size: &RectangleSize) -> Self {
         let mut matrix: Vec<Vec<FieldElement>> = Vec::new();
         for y in 0..size.1 {
             let mut row: Vec<FieldElement> = Vec::new();
@@ -82,7 +81,7 @@ impl Field {
             }
             matrix.push(row);
         }
-        Field {
+        Self {
             matrix,
         }
     }

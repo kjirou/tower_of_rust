@@ -1,13 +1,4 @@
-pub struct MapElementUpdate {
-    pub background: String,
-    pub foreground: String,
-    pub symbol: char,
-}
-
-pub struct ScreenUpdate {
-    // A map showing the area around the hero.
-    pub map: Vec<Vec<MapElementUpdate>>,
-}
+use crate::screen_update::ScreenUpdate;
 
 #[derive(Clone)]
 pub struct Cell {
@@ -23,7 +14,7 @@ pub struct Screen {
 }
 
 impl Screen {
-    pub fn new() -> Screen {
+    pub fn new() -> Self {
         let default_cell = Cell {
             position: (0, 0),
             symbol: ' ',
