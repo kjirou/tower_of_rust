@@ -42,7 +42,7 @@ impl Controller {
         let mut game = Game {
             operation_target: None,
         };
-        game.operation_target = Some((2, 2, String::from("player")));
+        game.operation_target = Some(((2, 2), String::from("player")));
 
         let mut screen = Screen::new();
         screen.update(&screen_update_builder::build(&field, &game));

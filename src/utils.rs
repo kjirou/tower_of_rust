@@ -1,6 +1,6 @@
 use crate::enums::FourDirection;
 use crate::enums::CustomErrorKind;
-use crate::types::{FieldElementPosition, FieldObjectLocation, RectangleSize, XYCoordinates, XYLocation, XYVector};
+use crate::types::{FieldElementPosition, RectangleSize, XYCoordinates, XYLocation, XYVector};
 
 pub mod dungeon_generator;
 pub mod rand_utils;
@@ -18,39 +18,6 @@ pub fn create_four_directions() -> Vec<FourDirection> {
         FourDirection::Down,
         FourDirection::Left,
     ]
-}
-
-pub fn fol_to_fep(location: &FieldObjectLocation) -> FieldElementPosition {
-    (location.0, location.1)
-}
-
-#[cfg(test)]
-mod tests_of_fol_to_fep {
-    use super::*;
-
-    struct TestCase {
-        args: (FieldObjectLocation,),
-        expected: FieldElementPosition,
-    }
-
-    #[test]
-    fn it_works() {
-        let table: Vec::<TestCase> = vec![
-            TestCase {
-                args: ((1, 2, String::from("foo")),),
-                expected: (1, 2),
-            },
-        ];
-        for test_case in table {
-            assert_eq!(
-                fol_to_fep(&test_case.args.0),
-                test_case.expected,
-                "{:?} => {:?}",
-                test_case.args.0,
-                test_case.expected,
-            );
-        }
-    }
 }
 
 pub fn translate_coordinate(start: &XYCoordinates, vector: &XYVector) -> XYCoordinates {
