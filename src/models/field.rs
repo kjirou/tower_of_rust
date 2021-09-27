@@ -1,6 +1,7 @@
 use crate::models::field_element::FieldElement;
 use crate::models::field_object::FieldObject;
 use crate::types::{FieldElementPosition, FieldObjectLocation, RectangleSize, XYCoordinates};
+use crate::utils::dungeon_generator::{Dungeon, DungeonCellKind};
 
 pub struct FieldSizeData {
     max_xy: XYCoordinates,
@@ -57,15 +58,23 @@ impl Field {
             from_field_element.move_field_object_to_another(&from.1, to_field_element);
         }
     }
-    pub fn surround_with_walls(&mut self) {
-        let field_size_data = self.get_size_data();
-        for y in 0..field_size_data.size.1 {
-            for x in 0..field_size_data.size.0 {
-                if y == 0 || y == field_size_data.max_xy.1 as u32 || x == 0 || x == field_size_data.max_xy.0 as u32 {
-                    // TODO: id の値が雑。
-                    let id = format!("wall-{}-{}", x, y);
-                    self.place_field_object(&(x, y), FieldObject::new_wall(id))
-                }
+    pub fn import_dungeon(&mut self, dungeon: &Dungeon) {
+        let size_data = self.get_size_data();
+        if size_data.size != dungeon.get_size() {
+            panic!("The sizes of the field and the dungeon do not match.");
+        }
+        for y in 0..size_data.size.1 {
+            for x in 0..size_data.size.0 {
+                let yu = y as usize;
+                let xu = x as usize;
+                match dungeon.matrix[yu][xu].kind {
+                    DungeonCellKind::Wall | DungeonCellKind::Blank => {
+                        // TODO: id の生成手順を管理する。
+                        let wall_id = format!("wall-{}-{}", x, y);
+                        self.place_field_object(&(x, y), FieldObject::new_wall(wall_id));
+                    },
+                    _ => {},
+                };
             }
         }
     }
