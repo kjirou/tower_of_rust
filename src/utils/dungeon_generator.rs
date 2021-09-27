@@ -210,6 +210,12 @@ impl DungeonSpace {
     fn get_bottom_right_position(&self) -> DungeonCellPosition {
         (self.position.0 + self.size.0 - 1, self.position.1 + self.size.1 - 1)
     }
+    pub fn get_random_position_in_space(&self, get_random: &GetRandom) -> DungeonCellPosition {
+        (
+            self.position.0 + rand_utils::get_ranged_random_integer(&get_random, 0, self.size.0 as i32 - 1) as u32,
+            self.position.1 + rand_utils::get_ranged_random_integer(&get_random, 0, self.size.1 as i32 - 1) as u32,
+        )
+    }
     fn is_overlapping_to_others(&self, wall_length: u32, other_locations: &Vec<XYLocation>) -> bool {
         let location = self.get_location_as_xy(wall_length);
         other_locations.iter().any(|other| {
@@ -258,6 +264,30 @@ impl DungeonSpace {
 #[cfg(test)]
 mod tests_of_dungeon_space {
     use super::*;
+
+    mod tests_of_get_random_position_in_space {
+        use super::*;
+
+        fn create_test_instance() -> DungeonSpace {
+            DungeonSpace {
+                position: (0, 0),
+                size: (1, 1),
+                kind: DungeonSpaceKind::Room,
+                depth: 0,
+            }
+        }
+
+        #[test]
+        fn it_should_return_the_same_value_to_the_position_of_space_when_the_space_is_1x1() {
+            let get_random: GetRandom = || { 0.0 };
+            let space = DungeonSpace {
+                position: (3, 2),
+                size: (1, 1),
+                ..create_test_instance()
+            };
+            assert_eq!(space.get_random_position_in_space(&get_random), (3, 2));
+        }
+    }
 
     mod tests_of_is_overlapping_to_others {
         use super::*;

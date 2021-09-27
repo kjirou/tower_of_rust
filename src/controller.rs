@@ -1,3 +1,6 @@
+use rand;
+use termion::event::Key;
+
 use crate::actions::*;
 use crate::enums::FourDirection;
 use crate::models::field::Field;
@@ -5,7 +8,9 @@ use crate::models::field_object::FieldObject;
 use crate::models::game::Game;
 use crate::screen::Screen;
 use crate::screen_update_builder;
-use termion::event::Key;
+use crate::types::{GetRandom, RectangleSize};
+use crate::utils::dungeon_generator::{self, DungeonGenerationParameters, DungeonSpace, DungeonSpaceKind};
+use crate::utils::rand_utils;
 
 pub struct Controller {
     field: Field,
@@ -35,14 +40,28 @@ impl Controller {
         self.screen.create_output_as_lines()
     }
     pub fn new() -> Self {
-        let mut field = Field::new(&(120, 36));
-        field.surround_with_walls();
-        field.place_field_object(&(2, 2), FieldObject::new_hero(String::from("player")));
+        let field_size: RectangleSize = (120, 36);
+
+        let get_random: GetRandom = || { rand::random::<f64>() };
+
+        let dungeon = dungeon_generator::generate_dungeon(&get_random, &DungeonGenerationParameters {
+            dungeon_size: field_size,
+            ..Default::default()
+        });
+
+        // Deside where to place the hero.
+        let rooms: Vec<&DungeonSpace> = dungeon.spaces.iter().filter(|e| e.kind == DungeonSpaceKind::Room).collect();
+        let room_where_hero_is_placed = rooms[rand_utils::choice_random_index(&get_random, rooms.len())];
+        let position_where_hero_is_placed = room_where_hero_is_placed.get_random_position_in_space(&get_random);
+
+        let mut field = Field::new(&field_size);
+        field.import_dungeon(&dungeon);
+        field.place_field_object(&position_where_hero_is_placed, FieldObject::new_hero(String::from("player")));
 
         let mut game = Game {
             operation_target: None,
         };
-        game.operation_target = Some(((2, 2), String::from("player")));
+        game.operation_target = Some((position_where_hero_is_placed, String::from("player")));
 
         let mut screen = Screen::new();
         screen.update(&screen_update_builder::build(&field, &game));
