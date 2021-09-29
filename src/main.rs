@@ -40,6 +40,8 @@ fn main() {
             write!(stdout, "{}{}", cursor::Hide, clear::All).unwrap();
             stdout.flush().unwrap();
 
+            let mut previous_output_lines: [String; 24] = Default::default();
+
             loop {
                 let key_input = match rx.try_recv() {
                     Ok(key_input) => Some(key_input),
@@ -67,9 +69,13 @@ fn main() {
 
                 controller.handle_main_roop(key_input);
 
-                for (i, line) in controller.create_screen_output_as_lines().iter().enumerate() {
-                    write!(stdout, "{}{}", cursor::Goto(1, i as u16 + 1), line).unwrap();
+                for (y, line) in controller.create_screen_output_as_lines().iter().enumerate() {
+                    if &previous_output_lines[y] != line {
+                        write!(stdout, "{}{}", cursor::Goto(1, y as u16 + 1), line).unwrap();
+                        previous_output_lines[y] = String::from(line);
+                    }
                 }
+                write!(stdout, "{}", style::Reset).unwrap();
                 stdout.flush().unwrap();
 
                 thread::sleep(Duration::from_millis(33));

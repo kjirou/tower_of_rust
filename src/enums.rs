@@ -10,3 +10,23 @@ pub enum FourDirection {
     Down,
     Left,
 }
+
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub enum ColorKind {
+    Black,
+    Blue,
+    Cyan,
+    Green,
+    LightBlack,
+    LightBlue,
+    LightCyan,
+    LightGreen,
+    LightMagenta,
+    LightRed,
+    LightWhite,
+    LightYellow,
+    Magenta,
+    Red,
+    White,
+    Yellow,
+}

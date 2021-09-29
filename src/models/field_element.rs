@@ -1,4 +1,3 @@
-use crate::models::field_object::DisplayKind;
 use crate::models::field_object::FieldObject;
 use crate::types::FieldElementPosition;
 
@@ -14,19 +13,6 @@ impl FieldElement {
     }
     pub fn is_impassable(&self) -> bool {
         self.field_objects.iter().any(|e| e.is_obstacle)
-    }
-    // TODO: foreground と　background を生成するための情報も必要。
-    // TODO: 中間に Props を作り、screen と models の両面へ DisplayKind 的な型を反映する。
-    pub fn get_display(&self) -> char {
-        if self.field_objects.len() == 0 {
-            return ' '
-        }
-        // TODO: 先頭の FieldObject が常に描画対象になるかは要検討。
-        let first = &self.field_objects[0];
-        match first.display_kind {
-            DisplayKind::Hero => '@',
-            DisplayKind::Wall => '#',
-        }
     }
     pub fn append_field_object(&mut self, field_object: FieldObject) {
         self.field_objects.push(field_object);
