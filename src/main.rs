@@ -62,11 +62,6 @@ fn main() {
                     _ => {},
                 };
 
-                // TODO: For debug.
-                if let Some(key_input) = key_input {
-                    print!("{:?}", key_input);
-                }
-
                 controller.handle_main_roop(key_input);
 
                 for (y, line) in controller.create_screen_output_as_lines().iter().enumerate() {
