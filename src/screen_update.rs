@@ -1,8 +1,10 @@
 //! A Data Transfer Object that aggregates the information required to update the screen.
 
+use crate::enums::{ColorKind};
+
 pub struct MapElementUpdate {
-    pub background: String,
-    pub foreground: String,
+    pub background: ColorKind,
+    pub foreground: ColorKind,
     pub symbol: char,
 }
 

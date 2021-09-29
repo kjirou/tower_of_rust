@@ -70,6 +70,7 @@ fn main() {
                 for (i, line) in controller.create_screen_output_as_lines().iter().enumerate() {
                     write!(stdout, "{}{}", cursor::Goto(1, i as u16 + 1), line).unwrap();
                 }
+                write!(stdout, "{}", style::Reset).unwrap();
                 stdout.flush().unwrap();
 
                 thread::sleep(Duration::from_millis(33));

@@ -1,3 +1,4 @@
+use crate::enums::{ColorKind};
 use crate::models::field::Field;
 use crate::models::game::Game;
 use crate::screen_update::{MapElementUpdate, ScreenUpdate};
@@ -21,21 +22,21 @@ pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
                     match field_element {
                         Some(field_element) => MapElementUpdate {
                             symbol: field_element.get_display(),
-                            foreground: String::from(""),
-                            background: String::from(""),
+                            foreground: ColorKind::White,
+                            background: ColorKind::Black,
                         },
                         _ => MapElementUpdate {
                             symbol: 'X',
-                            foreground: String::from(""),
-                            background: String::from(""),
+                            foreground: ColorKind::White,
+                            background: ColorKind::Black,
                         },
                     }
                 },
                 _ => {
                     MapElementUpdate {
                         symbol: '?',
-                        foreground: String::from(""),
-                        background: String::from(""),
+                        foreground: ColorKind::White,
+                        background: ColorKind::Black,
                     }
                 },
             };
