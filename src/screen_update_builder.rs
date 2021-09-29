@@ -36,16 +36,16 @@ fn create_field_element_display(field_element: &FieldElement) -> MapElementUpdat
 pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
     let map_size: RectangleSize = (21, 13);
     let mut map: Vec<Vec<MapElementUpdate>> = vec![];
-    let map_xy: Option<XYCoordinates> = match &game.operation_target {
+    let hero_xy: Option<XYCoordinates> = match &game.operation_target {
         Some(operation_target) => Some(translate_rectangle_on_field(&map_size, &operation_target.0)),
         _ => None,
     };
     for map_y in 0..map_size.1 {
         let mut map_row: Vec<MapElementUpdate> = vec![];
         for map_x in 0..map_size.0 {
-            let map_element_update: MapElementUpdate = match map_xy {
-                Some(map_xy) => {
-                    let xy = (map_xy.0 + map_x as i32, map_xy.1 + map_y as i32);
+            let map_element_update: MapElementUpdate = match hero_xy {
+                Some(hero_xy) => {
+                    let xy = (hero_xy.0 + map_x as i32, hero_xy.1 + map_y as i32);
                     let field_element = field.find_field_element_by_xy(&xy);
                     match field_element {
                         Some(field_element) => create_field_element_display(field_element),
