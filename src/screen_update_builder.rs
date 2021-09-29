@@ -1,9 +1,37 @@
 use crate::enums::{ColorKind};
 use crate::models::field::Field;
+use crate::models::field_element::FieldElement;
+use crate::models::field_object::DisplayKind;
 use crate::models::game::Game;
 use crate::screen_update::{MapElementUpdate, ScreenUpdate};
 use crate::types::{RectangleSize, XYCoordinates};
 use crate::utils::{translate_rectangle_on_field};
+
+fn create_field_element_display(field_element: &FieldElement) -> MapElementUpdate {
+    let mut symbol = '.';
+    let mut foreground = ColorKind::LightBlack;
+    let background = ColorKind::Black;
+
+    if field_element.field_objects.len() > 0 {
+        let first = &field_element.field_objects[0];
+        match first.display_kind {
+            DisplayKind::Hero => {
+                symbol = '@';
+                foreground = ColorKind::Magenta;
+            },
+            DisplayKind::Wall => {
+                symbol = '#';
+                foreground = ColorKind::LightBlack;
+            },
+        }
+    }
+
+    MapElementUpdate {
+        symbol,
+        foreground,
+        background,
+    }
+}
 
 pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
     let map_size: RectangleSize = (21, 13);
@@ -20,14 +48,10 @@ pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
                     let xy = (map_xy.0 + map_x as i32, map_xy.1 + map_y as i32);
                     let field_element = field.find_field_element_by_xy(&xy);
                     match field_element {
-                        Some(field_element) => MapElementUpdate {
-                            symbol: field_element.get_display(),
-                            foreground: ColorKind::White,
-                            background: ColorKind::Black,
-                        },
+                        Some(field_element) => create_field_element_display(field_element),
                         _ => MapElementUpdate {
-                            symbol: 'X',
-                            foreground: ColorKind::White,
+                            symbol: '#',
+                            foreground: ColorKind::LightBlack,
                             background: ColorKind::Black,
                         },
                     }
