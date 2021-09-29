@@ -462,7 +462,7 @@ impl Screen {
             ],
         ];
 
-        // Assign the initial data.
+        // Set each position.
         for y in 0..matrix.len() {
             let row = &matrix[y];
             for x in 0..row.len() {
@@ -526,22 +526,92 @@ impl Screen {
             }
         }
     }
+    /// Create the output of the specified line.
+    ///
+    /// If the foreground and the background are the same in consecutive cells, the output is omitted.
+    pub fn create_one_line_output(&self, y: usize) -> String {
+        let row = &self.matrix[y];
+        let mut last_fg: &str = "";
+        let mut last_bg: &str = "";
+        let mut output: String = String::from("");
+        for cell in row {
+            let fg = self.foreground_map.get(&cell.foreground).unwrap();
+            let bg = self.background_map.get(&cell.background).unwrap();
+            if fg != last_fg {
+                output = output + fg;
+                last_fg = fg;
+            }
+            if bg != last_bg {
+                output = output + bg;
+                last_bg = bg;
+            }
+            output = output + &cell.symbol.to_string();
+        }
+        output
+    }
     /// Reset the ANSI style after outputting these!
     pub fn create_output_as_lines(&self) -> Vec::<String> {
-        self.matrix.iter()
-            .map(|row| {
-                row.iter()
-                    .map(|cell| {
-                        format!(
-                            "{}{}{}",
-                            self.foreground_map.get(&cell.foreground).unwrap(),
-                            self.background_map.get(&cell.background).unwrap(),
-                            cell.symbol.to_string(),
-                        )
-                    })
-                    .collect::<Vec<String>>()
-                    .join("")
-            })
-            .collect::<Vec<String>>()
+        self.matrix.iter().enumerate()
+            .map(|(y, _)| self.create_one_line_output(y))
+            .collect()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn create_test_instance() -> Screen {
+        Screen::new()
+    }
+
+    mod tests_of_create_one_line_output {
+        use super::*;
+
+        #[test]
+        fn it_can_compress_the_default_first_line() {
+            let screen = create_test_instance();
+            let first_cell = &screen.matrix[0][0];
+            assert_eq!(
+                screen.create_one_line_output(0),
+                format!(
+                    "{}{}{}",
+                    screen.foreground_map.get(&first_cell.foreground).unwrap(),
+                    screen.background_map.get(&first_cell.background).unwrap(),
+                    String::from(" ").repeat(80),
+                ),
+            );
+        }
+        #[test]
+        fn it_can_compress_the_output_when_it_changes_fg_and_bg_in_the_middle_of_the_line() {
+            let mut screen = create_test_instance();
+            screen.matrix[0][2] = Cell {
+                foreground: ColorKind::Red,
+                background: ColorKind::Blue,
+                ..screen.matrix[0][2]
+            };
+            screen.matrix[0][3] = Cell {
+                foreground: ColorKind::Red,
+                background: ColorKind::Blue,
+                ..screen.matrix[0][3]
+            };
+            let first_cell = &screen.matrix[0][0];
+            let third_cell = &screen.matrix[0][2];
+            assert_eq!(
+                screen.create_one_line_output(0),
+                format!(
+                    "{}{}{}{}{}{}{}{}{}",
+                    screen.foreground_map.get(&first_cell.foreground).unwrap(),
+                    screen.background_map.get(&first_cell.background).unwrap(),
+                    String::from(" ").repeat(2),
+                    screen.foreground_map.get(&third_cell.foreground).unwrap(),
+                    screen.background_map.get(&third_cell.background).unwrap(),
+                    String::from(" ").repeat(2),
+                    screen.foreground_map.get(&first_cell.foreground).unwrap(),
+                    screen.background_map.get(&first_cell.background).unwrap(),
+                    String::from(" ").repeat(76),
+                ),
+            );
+        }
     }
 }
