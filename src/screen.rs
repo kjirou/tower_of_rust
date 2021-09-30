@@ -516,15 +516,17 @@ impl Screen {
     }
     pub fn update(&mut self, screen_update: &ScreenUpdate) {
         // Map
-        let map_xy = (2, 2);
+        let map_position = (2, 2);
         for (map_y, map_row) in screen_update.map.iter().enumerate() {
             for (map_x, map_element) in map_row.iter().enumerate() {
-                let xy = (map_xy.0 + map_x, map_xy.1 + map_y);
-                self.matrix[xy.1][xy.0].symbol = map_element.symbol;
-                self.matrix[xy.1][xy.0].foreground = map_element.foreground.clone();
-                self.matrix[xy.1][xy.0].background = map_element.background.clone();
+                let position = (map_position.0 + map_x, map_position.1 + map_y);
+                self.matrix[position.1][position.0].symbol = map_element.symbol;
+                self.matrix[position.1][position.0].foreground = map_element.foreground.clone();
+                self.matrix[position.1][position.0].background = map_element.background.clone();
             }
         }
+
+        // Debug prints
     }
     /// Create the output of the specified line.
     ///
