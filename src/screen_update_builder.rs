@@ -34,6 +34,13 @@ fn create_field_element_display(field_element: &FieldElement) -> MapElementUpdat
 }
 
 pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
+    // Last Key Input
+    let last_key_input: String = match &game.last_key_input {
+        Some(key_input) => format!("{:?}", key_input),
+        None => String::from("None"),
+    };
+
+    // Map
     let map_size: RectangleSize = (21, 13);
     let mut map: Vec<Vec<MapElementUpdate>> = vec![];
     let hero_xy: Option<XYCoordinates> = match &game.operation_target {
@@ -70,6 +77,7 @@ pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
     }
 
     ScreenUpdate {
+        last_key_input,
         map,
     }
 }

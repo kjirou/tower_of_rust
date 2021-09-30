@@ -9,6 +9,7 @@ pub struct MapElementUpdate {
 }
 
 pub struct ScreenUpdate {
+    pub last_key_input: String,
     /// A map showing the area around the hero.
     pub map: Vec<Vec<MapElementUpdate>>,
 }
