@@ -36,6 +36,7 @@ fn create_field_element_display(field_element: &FieldElement) -> MapElementUpdat
 pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
     // Last Key Input
     let last_key_input: String = match &game.last_key_input {
+        // TODO: 雑。不慮の文字が入りうる。
         Some(key_input) => format!("{:?}", key_input),
         None => String::from("None"),
     };
