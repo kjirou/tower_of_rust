@@ -621,7 +621,7 @@ impl Screen {
     }
     /// Create the output as lines of string.
     /// 
-    /// Reset the ANSI style after outputting these!
+    /// You should reset the ANSI style after outputting these.
     pub fn create_output_as_lines(&self) -> Vec::<String> {
         self.matrix.iter().enumerate()
             .map(|(y, _)| self.create_one_line_output(y))
