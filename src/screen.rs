@@ -583,6 +583,14 @@ impl Screen {
         }
 
         // Debug prints
+        let debug_prints = format!(
+            "{}",
+            screen_update.last_key_input,
+        );
+        self.write_text(&(70, 0), &(10, 3), &debug_prints, &WriteTextParameters {
+            auto_line_break: false,
+            ..Default::default()
+        });
     }
     pub fn dump_as_text(&self, position: &ScreenCellPosition, size: &RectangleSize) -> String {
         let mut text: String = String::from("");
