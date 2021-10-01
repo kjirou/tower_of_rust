@@ -20,7 +20,9 @@ pub struct Controller {
 
 impl Controller {
     pub fn handle_main_roop(&mut self, key_input: Option<Key>) {
-        self.game.last_key_input = key_input;
+        if key_input.is_some() {
+            self.game.last_key_input = key_input;
+        }
 
         match key_input {
             Some(key_input) => {
