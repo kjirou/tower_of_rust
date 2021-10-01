@@ -3,14 +3,32 @@ use termion::color;
 
 use crate::enums::{ColorKind};
 use crate::screen_update::ScreenUpdate;
+use crate::types::RectangleSize;
+
+type ScreenCellPosition = (u8, u8);
 
 #[derive(Clone)]
 struct Cell {
     background: ColorKind,
     foreground: ColorKind,
     /// (x, y)
-    position: (u8, u8),
+    position: ScreenCellPosition,
     symbol: char,
+}
+
+pub struct WriteTextParameters {
+    auto_line_break: bool,
+    background: Option<ColorKind>,
+    foreground: Option<ColorKind>,
+}
+impl Default for WriteTextParameters {
+    fn default() -> Self {
+        Self {
+            foreground: None,
+            background: None,
+            auto_line_break: true,
+        }
+    }
 }
 
 pub struct Screen {
@@ -514,6 +532,44 @@ impl Screen {
             background_map,
         }
     }
+    pub fn get_size(&self) -> RectangleSize {
+        (self.matrix[0].len() as u32, self.matrix.len() as u32)
+    }
+    /// Write the text into the rectangle.
+    pub fn write_text(&mut self, position: &ScreenCellPosition, size: &RectangleSize, text: &str, params: &WriteTextParameters) {
+        let chars: Vec<char> = text.chars().collect();
+        let bottom_right_position: (u8, u8) = (position.0 + size.0 as u8 - 1, position.1 + size.1 as u8 - 1);
+        let screen_size = self.get_size();
+        if bottom_right_position.0 >= screen_size.0 as u8 || bottom_right_position.1 >= screen_size.1 as u8 {
+            panic!("The text area is out of the screen.");
+        }
+        let mut pointer: (usize, usize) = (position.0 as usize, position.1 as usize);
+        for ch in chars {
+            if pointer.1 > bottom_right_position.1 as usize {
+                break;
+            }
+            if ch == '\n' {
+                pointer.0 = 0;
+                pointer.1 += 1;
+                continue;
+            }
+            if pointer.0 <= bottom_right_position.0 as usize {
+                self.matrix[pointer.1][pointer.0].symbol = ch;
+            }
+            if params.foreground.is_some() {
+                self.matrix[pointer.1][pointer.0].foreground = params.foreground.clone().unwrap();
+            }
+            if params.background.is_some() {
+                self.matrix[pointer.1][pointer.0].background = params.background.clone().unwrap();
+            }
+            if pointer.0 >= bottom_right_position.0 as usize && params.auto_line_break {
+                pointer.0 = 0;
+                pointer.1 += 1;
+            } else {
+                pointer.0 += 1;
+            }
+        }
+    }
     pub fn update(&mut self, screen_update: &ScreenUpdate) {
         // Map
         let map_position = (2, 2);
@@ -527,6 +583,18 @@ impl Screen {
         }
 
         // Debug prints
+    }
+    pub fn dump_as_text(&self, position: &ScreenCellPosition, size: &RectangleSize) -> String {
+        let mut text: String = String::from("");
+        for y in (position.1)..(position.1 + size.1 as u8) {
+            for x in (position.1)..(position.0 + size.0 as u8) {
+                text += &self.matrix[y as usize][x as usize].symbol.to_string();
+            }
+            if y != position.1 + size.1 as u8 - 1 {
+                text += &"\n";
+            }
+        }
+        text
     }
     /// Create the output of the specified line.
     ///
@@ -551,6 +619,8 @@ impl Screen {
         }
         output
     }
+    /// Create the output as lines of string.
+    /// 
     /// Reset the ANSI style after outputting these!
     pub fn create_output_as_lines(&self) -> Vec::<String> {
         self.matrix.iter().enumerate()
@@ -565,6 +635,150 @@ mod tests {
 
     fn create_test_instance() -> Screen {
         Screen::new()
+    }
+
+    mod tests_of_dump_as_text {
+        use super::*;
+
+        #[test]
+        fn it_works() {
+            let mut screen = Screen {
+                ..create_test_instance()
+            };
+            screen.matrix[1][2].symbol = 'a';
+            screen.matrix[1][3].symbol = 'b';
+            screen.matrix[2][3].symbol = 'c';
+            screen.matrix[2][4].symbol = 'd';
+            assert_eq!(
+                screen.dump_as_text(&(0, 0), &(5, 4)),
+                vec![
+                    "     ",
+                    "  ab ",
+                    "   cd",
+                    "     ",
+                ].join("\n"),
+            );
+        }
+    }
+
+    mod tests_of_write_text {
+        use super::*;
+
+        #[test]
+        #[should_panic(expected = " out of the screen")]
+        fn it_should_panic_when_the_horizontal_extent_of_the_text_is_out_of_the_screen() {
+            let mut instance = create_test_instance();
+            let screen_size = instance.get_size();
+            instance.write_text(&(1, 1), &(screen_size.0, 1), "", &Default::default());
+        }
+        #[test]
+        #[should_panic(expected = " out of the screen")]
+        fn it_should_panic_when_the_vertical_extent_of_the_text_is_out_of_the_screen() {
+            let mut instance = create_test_instance();
+            let screen_size = instance.get_size();
+            instance.write_text(&(1, 1), &(1, screen_size.1), "", &Default::default());
+        }
+        #[test]
+        fn it_should_do_nothing_when_there_are_zero_chars() {
+            let mut instance = create_test_instance();
+            let before_dump = instance.dump_as_text(&(0, 0), &(80, 24));
+            instance.write_text(&(0, 0), &(80, 24), "", &Default::default());
+            let after_dump = instance.dump_as_text(&(0, 0), &(80, 24));
+            assert_eq!(before_dump, after_dump);
+        }
+        #[test]
+        fn it_can_write_a_single_line() {
+            let mut instance = create_test_instance();
+            instance.write_text(&(0, 0), &(80, 24), "abc", &Default::default());
+            assert_eq!(
+                instance.dump_as_text(&(0, 0), &(4, 2)),
+                vec![
+                    "abc ",
+                    "    ",
+                ].join("\n"),
+            );
+        }
+        #[test]
+        fn it_can_set_any_starting_point() {
+            let mut instance = create_test_instance();
+            instance.write_text(&(2, 1), &(1, 1), "a", &Default::default());
+            assert_eq!(
+                instance.dump_as_text(&(0, 0), &(4, 3)),
+                vec![
+                    "    ",
+                    "  a ",
+                    "    ",
+                ].join("\n"),
+            );
+        }
+        #[test]
+        fn it_can_break_lines_with_a_line_feed_character() {
+            let mut instance = create_test_instance();
+            instance.write_text(&(0, 0), &(80, 24), "a\nbc\ndef", &Default::default());
+            assert_eq!(
+                instance.dump_as_text(&(0, 0), &(4, 4)),
+                vec![
+                    "a   ",
+                    "bc  ",
+                    "def ",
+                    "    ",
+                ].join("\n"),
+            );
+        }
+        #[test]
+        fn it_should_break_lines_when_the_text_reaches_the_right_edge() {
+            let mut instance = create_test_instance();
+            instance.write_text(&(0, 0), &(3, 24), "1234567", &Default::default());
+            assert_eq!(
+                instance.dump_as_text(&(0, 0), &(4, 4)),
+                vec![
+                    "123 ",
+                    "456 ",
+                    "7   ",
+                    "    ",
+                ].join("\n"),
+            );
+        }
+        #[test]
+        fn it_should_not_break_lines_when_the_text_reaches_the_right_edge_but_the_auto_line_break_is_false() {
+            let mut instance = create_test_instance();
+            instance.write_text(&(0, 0), &(3, 24), "12345\n67890", &WriteTextParameters {
+                auto_line_break: false,
+                ..Default::default()
+            });
+            assert_eq!(
+                instance.dump_as_text(&(0, 0), &(4, 3)),
+                vec![
+                    "123 ",
+                    "678 ",
+                    "    ",
+                ].join("\n"),
+            );
+        }
+        #[test]
+        fn it_should_ignore_when_the_number_of_lines_is_exceeded() {
+            let mut instance = create_test_instance();
+            instance.write_text(&(0, 0), &(3, 2), "1234567890", &Default::default());
+            assert_eq!(
+                instance.dump_as_text(&(0, 0), &(4, 3)),
+                vec![
+                    "123 ",
+                    "456 ",
+                    "    ",
+                ].join("\n"),
+            );
+        }
+        #[test]
+        fn it_can_set_colors() {
+            let mut instance = create_test_instance();
+            instance.write_text(&(0, 0), &(80, 24), "1", &WriteTextParameters {
+                foreground: Some(ColorKind::Red),
+                background: Some(ColorKind::Blue),
+                ..Default::default()
+            });
+            assert_eq!(instance.matrix[0][0].foreground, ColorKind::Red);
+            assert_eq!(instance.matrix[0][0].background, ColorKind::Blue);
+        }
     }
 
     mod tests_of_create_one_line_output {
