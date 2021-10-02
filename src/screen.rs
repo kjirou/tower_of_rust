@@ -578,7 +578,7 @@ impl Screen {
             }
             if ch == '\n' {
                 if !auto_line_break_in_last_loop {
-                    pointer.0 = 0;
+                    pointer.0 = position.0 as usize;
                     pointer.1 += 1;
                 }
                 auto_line_break_in_last_loop = false;
@@ -594,7 +594,7 @@ impl Screen {
                 self.matrix[pointer.1][pointer.0].background = params.background.clone().unwrap();
             }
             if pointer.0 >= bottom_right_position.0 as usize && params.auto_line_break {
-                pointer.0 = 0;
+                pointer.0 = position.0 as usize;
                 pointer.1 += 1;
                 auto_line_break_in_last_loop = true;
             } else {
@@ -746,12 +746,13 @@ mod tests {
         #[test]
         fn it_can_set_any_starting_point() {
             let mut instance = create_test_instance();
-            instance.write_text(&(2, 1), &(1, 1), "a", &Default::default());
+            instance.write_text(&(2, 1), &(1, 2), "a\nb", &Default::default());
             assert_eq!(
-                instance.dump_as_text(&(0, 0), &(4, 3)),
+                instance.dump_as_text(&(0, 0), &(4, 4)),
                 vec![
                     "    ",
                     "  a ",
+                    "  b ",
                     "    ",
                 ].join("\n"),
             );
