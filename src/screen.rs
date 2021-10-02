@@ -544,13 +544,17 @@ impl Screen {
             panic!("The text area is out of the screen.");
         }
         let mut pointer: (usize, usize) = (position.0 as usize, position.1 as usize);
+        let mut auto_line_break_in_last_loop = false;
         for ch in chars {
             if pointer.1 > bottom_right_position.1 as usize {
                 break;
             }
             if ch == '\n' {
-                pointer.0 = 0;
-                pointer.1 += 1;
+                if !auto_line_break_in_last_loop {
+                    pointer.0 = 0;
+                    pointer.1 += 1;
+                }
+                auto_line_break_in_last_loop = false;
                 continue;
             }
             if pointer.0 <= bottom_right_position.0 as usize {
@@ -565,8 +569,10 @@ impl Screen {
             if pointer.0 >= bottom_right_position.0 as usize && params.auto_line_break {
                 pointer.0 = 0;
                 pointer.1 += 1;
+                auto_line_break_in_last_loop = true;
             } else {
                 pointer.0 += 1;
+                auto_line_break_in_last_loop = false;
             }
         }
     }
@@ -760,6 +766,25 @@ mod tests {
                     "456 ",
                     "7   ",
                     "    ",
+                ].join("\n"),
+            );
+        }
+        #[test]
+        fn it_should_break_line_once_when_the_line_feed_is_the_last_char_of_the_line() {
+            let mut instance = create_test_instance();
+            instance.write_text(&(0, 0), &(1, 24), "1\n23\n\n4", &WriteTextParameters {
+                auto_line_break: true,
+                ..Default::default()
+            });
+            assert_eq!(
+                instance.dump_as_text(&(0, 0), &(2, 6)),
+                vec![
+                    "1 ",
+                    "2 ",
+                    "3 ",
+                    "  ",
+                    "4 ",
+                    "  ",
                 ].join("\n"),
             );
         }
