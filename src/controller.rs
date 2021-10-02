@@ -1,4 +1,5 @@
 use rand;
+use std::time::Instant;
 use termion::event::Key;
 
 use crate::actions::*;
@@ -19,7 +20,13 @@ pub struct Controller {
 }
 
 impl Controller {
-    pub fn handle_main_roop(&mut self, key_input: Option<Key>) {
+    pub fn handle_main_roop(&mut self, now: &Instant, key_input: Option<Key>) {
+        self.game.number_of_frames += 1;
+        self.game.caluculate_fps_in_3_second_cycles(now);
+        if key_input.is_some() {
+            self.game.last_key_input = key_input;
+        }
+
         match key_input {
             Some(key_input) => {
                 match key_input {
@@ -58,9 +65,7 @@ impl Controller {
         field.import_dungeon(&dungeon);
         field.place_field_object(&position_where_hero_is_placed, FieldObject::new_hero(String::from("player")));
 
-        let mut game = Game {
-            operation_target: None,
-        };
+        let mut game = Game::new();
         game.operation_target = Some((position_where_hero_is_placed, String::from("player")));
 
         let mut screen = Screen::new();
