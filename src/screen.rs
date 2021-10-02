@@ -20,6 +20,7 @@ pub struct WriteTextParameters {
     auto_line_break: bool,
     background: Option<ColorKind>,
     foreground: Option<ColorKind>,
+    symbol_to_padding: Option<char>,
 }
 impl Default for WriteTextParameters {
     fn default() -> Self {
@@ -27,6 +28,7 @@ impl Default for WriteTextParameters {
             foreground: None,
             background: None,
             auto_line_break: false,
+            symbol_to_padding: None,
         }
     }
 }
@@ -535,13 +537,38 @@ impl Screen {
     pub fn get_size(&self) -> RectangleSize {
         (self.matrix[0].len() as u32, self.matrix.len() as u32)
     }
+    fn update_rectangle(
+        &mut self,
+        position: &ScreenCellPosition,
+        size: &RectangleSize,
+        symbol: Option<char>,
+        foreground: Option<&ColorKind>,
+        background: Option<&ColorKind>,
+    ) {
+        for y in (position.1 as usize)..(position.1 as usize + size.1 as usize) {
+            for x in (position.0 as usize)..(position.0 as usize + size.0 as usize) {
+                if symbol.is_some() {
+                    self.matrix[y][x].symbol = symbol.unwrap();
+                }
+                if foreground.is_some() {
+                    self.matrix[y][x].foreground = foreground.unwrap().clone();
+                }
+                if background.is_some() {
+                    self.matrix[y][x].background = background.unwrap().clone();
+                }
+            }
+        }
+    }
     /// Write the text into the rectangle.
-    pub fn write_text(&mut self, position: &ScreenCellPosition, size: &RectangleSize, text: &str, params: &WriteTextParameters) {
+    fn write_text(&mut self, position: &ScreenCellPosition, size: &RectangleSize, text: &str, params: &WriteTextParameters) {
         let chars: Vec<char> = text.chars().collect();
         let bottom_right_position: (u8, u8) = (position.0 + size.0 as u8 - 1, position.1 + size.1 as u8 - 1);
         let screen_size = self.get_size();
         if bottom_right_position.0 >= screen_size.0 as u8 || bottom_right_position.1 >= screen_size.1 as u8 {
             panic!("The text area is out of the screen.");
+        }
+        if params.symbol_to_padding.is_some() {
+            self.update_rectangle(position, size, params.symbol_to_padding, None, None);
         }
         let mut pointer: (usize, usize) = (position.0 as usize, position.1 as usize);
         let mut auto_line_break_in_last_loop = false;
@@ -595,6 +622,7 @@ impl Screen {
         );
         self.write_text(&(70, 0), &(10, 3), &debug_prints, &WriteTextParameters {
             auto_line_break: false,
+            symbol_to_padding: Some(' '),
             ..Default::default()
         });
     }
@@ -651,27 +679,29 @@ mod tests {
         Screen::new()
     }
 
-    mod tests_of_dump_as_text {
+    mod tests_of_update_rectangle {
         use super::*;
 
         #[test]
-        fn it_works() {
-            let mut screen = Screen {
-                ..create_test_instance()
-            };
-            screen.matrix[1][2].symbol = 'a';
-            screen.matrix[1][3].symbol = 'b';
-            screen.matrix[2][3].symbol = 'c';
-            screen.matrix[2][4].symbol = 'd';
+        fn it_can_update_symbols_with_a_located_rectangle() {
+            let mut instance = create_test_instance();
+            instance.update_rectangle(&(2, 1), &(3, 2), Some('a'), None, None);
             assert_eq!(
-                screen.dump_as_text(&(0, 0), &(5, 4)),
+                instance.dump_as_text(&(0, 0), &(6, 4)),
                 vec![
-                    "     ",
-                    "  ab ",
-                    "   cd",
-                    "     ",
+                    "      ",
+                    "  aaa ",
+                    "  aaa ",
+                    "      ",
                 ].join("\n"),
             );
+        }
+        #[test]
+        fn it_can_update_foregrounds_and_backgrounds() {
+            let mut instance = create_test_instance();
+            instance.update_rectangle(&(0, 0), &(1, 1), None, Some(&ColorKind::Red), Some(&ColorKind::Blue));
+            assert_eq!(instance.matrix[0][0].foreground, ColorKind::Red);
+            assert_eq!(instance.matrix[0][0].background, ColorKind::Blue);
         }
     }
 
@@ -811,6 +841,46 @@ mod tests {
             });
             assert_eq!(instance.matrix[0][0].foreground, ColorKind::Red);
             assert_eq!(instance.matrix[0][0].background, ColorKind::Blue);
+        }
+        #[test]
+        fn it_can_do_padding_with_a_symbol() {
+            let mut instance = create_test_instance();
+            instance.write_text(&(0, 0), &(2, 3), "1\n2", &WriteTextParameters {
+                symbol_to_padding: Some('P'),
+                ..Default::default()
+            });
+            assert_eq!(
+                instance.dump_as_text(&(0, 0), &(2, 3)),
+                vec![
+                    "1P",
+                    "2P",
+                    "PP",
+                ].join("\n"),
+            );
+        }
+    }
+
+    mod tests_of_dump_as_text {
+        use super::*;
+
+        #[test]
+        fn it_works() {
+            let mut screen = Screen {
+                ..create_test_instance()
+            };
+            screen.matrix[1][2].symbol = 'a';
+            screen.matrix[1][3].symbol = 'b';
+            screen.matrix[2][3].symbol = 'c';
+            screen.matrix[2][4].symbol = 'd';
+            assert_eq!(
+                screen.dump_as_text(&(0, 0), &(5, 4)),
+                vec![
+                    "     ",
+                    "  ab ",
+                    "   cd",
+                    "     ",
+                ].join("\n"),
+            );
         }
     }
 
