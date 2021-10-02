@@ -26,7 +26,7 @@ impl Default for WriteTextParameters {
         Self {
             foreground: None,
             background: None,
-            auto_line_break: true,
+            auto_line_break: false,
         }
     }
 }
@@ -734,9 +734,25 @@ mod tests {
             );
         }
         #[test]
-        fn it_should_break_lines_when_the_text_reaches_the_right_edge() {
+        fn it_should_not_break_lines_when_the_text_reaches_the_right_edge() {
             let mut instance = create_test_instance();
-            instance.write_text(&(0, 0), &(3, 24), "1234567", &Default::default());
+            instance.write_text(&(0, 0), &(3, 24), "12345\n67890", &Default::default());
+            assert_eq!(
+                instance.dump_as_text(&(0, 0), &(4, 3)),
+                vec![
+                    "123 ",
+                    "678 ",
+                    "    ",
+                ].join("\n"),
+            );
+        }
+        #[test]
+        fn it_should_break_lines_when_the_text_reaches_the_right_edge_but_the_auto_line_break_is_true() {
+            let mut instance = create_test_instance();
+            instance.write_text(&(0, 0), &(3, 24), "1234567", &WriteTextParameters {
+                auto_line_break: true,
+                ..Default::default()
+            });
             assert_eq!(
                 instance.dump_as_text(&(0, 0), &(4, 4)),
                 vec![
@@ -748,31 +764,15 @@ mod tests {
             );
         }
         #[test]
-        fn it_should_not_break_lines_when_the_text_reaches_the_right_edge_but_the_auto_line_break_is_false() {
-            let mut instance = create_test_instance();
-            instance.write_text(&(0, 0), &(3, 24), "12345\n67890", &WriteTextParameters {
-                auto_line_break: false,
-                ..Default::default()
-            });
-            assert_eq!(
-                instance.dump_as_text(&(0, 0), &(4, 3)),
-                vec![
-                    "123 ",
-                    "678 ",
-                    "    ",
-                ].join("\n"),
-            );
-        }
-        #[test]
         fn it_should_ignore_when_the_number_of_lines_is_exceeded() {
             let mut instance = create_test_instance();
-            instance.write_text(&(0, 0), &(3, 2), "1234567890", &Default::default());
+            instance.write_text(&(0, 0), &(3, 2), "1\n2\n3", &Default::default());
             assert_eq!(
-                instance.dump_as_text(&(0, 0), &(4, 3)),
+                instance.dump_as_text(&(0, 0), &(2, 3)),
                 vec![
-                    "123 ",
-                    "456 ",
-                    "    ",
+                    "1 ",
+                    "2 ",
+                    "  ",
                 ].join("\n"),
             );
         }
