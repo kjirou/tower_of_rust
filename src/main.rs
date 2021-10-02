@@ -6,7 +6,7 @@ use clap::{Arg, App};
 use std::io::{self, Write};
 use std::sync::mpsc;
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use termion::{clear, cursor, style};
 use termion::event::Key;
 use termion::input::TermRead;
@@ -32,9 +32,9 @@ fn main() {
         let (tx, rx) = mpsc::channel::<Key>();
 
         let main_loop_handle = thread::spawn(move || {
-            // NOTE: Restores the state of the previous terminal when dropping `stdout` variable.
+            // NOTE: Restore the state of the previous terminal when dropping `stdout` variable.
             //       https://github.com/redox-os/termion/blob/dce5e7500fd709987f9bf8f3911e4daa61d0ad14/src/raw.rs#L34-L37
-            //       If user exits the program without dropping, the terminal will break.
+            //       If an user exits this program without dropping `stdout`, the user's terminal will break.
             let mut stdout = io::stdout().into_raw_mode().unwrap();
 
             write!(stdout, "{}{}", cursor::Hide, clear::All).unwrap();
@@ -43,6 +43,7 @@ fn main() {
             let mut previous_output_lines: [String; 24] = Default::default();
 
             loop {
+                let now = Instant::now();
                 let key_input = match rx.try_recv() {
                     Ok(key_input) => Some(key_input),
                     Err(_) => None,
@@ -62,7 +63,7 @@ fn main() {
                     _ => {},
                 };
 
-                controller.handle_main_roop(key_input);
+                controller.handle_main_roop(&now, key_input);
 
                 for (y, line) in controller.create_screen_output_as_lines().iter().enumerate() {
                     if &previous_output_lines[y] != line {

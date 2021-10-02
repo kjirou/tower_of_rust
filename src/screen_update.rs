@@ -9,6 +9,7 @@ pub struct MapElementUpdate {
 }
 
 pub struct ScreenUpdate {
+    pub fps: f64,
     pub last_key_input: String,
     pub number_of_frames: u64,
     /// A map showing the area around the hero.
