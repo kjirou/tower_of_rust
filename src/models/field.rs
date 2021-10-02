@@ -71,7 +71,7 @@ impl Field {
                     DungeonCellKind::Wall | DungeonCellKind::Blank => {
                         // TODO: id の生成手順を管理する。
                         let wall_id = format!("wall-{}-{}", x, y);
-                        self.place_field_object(&(x, y), FieldObject::new_wall(wall_id));
+                        self.place_field_object(&(x, y), FieldObject::new_wall(&wall_id));
                     },
                     _ => {},
                 };

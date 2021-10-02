@@ -63,7 +63,7 @@ impl Controller {
 
         let mut field = Field::new(&field_size);
         field.import_dungeon(&dungeon);
-        field.place_field_object(&position_where_hero_is_placed, FieldObject::new_hero(String::from("player")));
+        field.place_field_object(&position_where_hero_is_placed, FieldObject::new_hero("player"));
 
         let mut game = Game::new();
         game.operation_target = Some((position_where_hero_is_placed, String::from("player")));
