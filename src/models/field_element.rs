@@ -8,8 +8,17 @@ pub struct FieldElement {
 }
 
 impl FieldElement {
+    pub fn new(position: &FieldElementPosition) -> Self {
+        Self {
+            position: position.clone(),
+            field_objects: vec![],
+        }
+    }
     pub fn get_position(&self) -> FieldElementPosition {
         self.position.clone()
+    }
+    pub fn find_field_object(&self, field_object_id: &str) -> Option<&FieldObject> {
+        self.field_objects.iter().find(|&e| &e.id == field_object_id)
     }
     pub fn is_impassable(&self) -> bool {
         self.field_objects.iter().any(|e| e.is_obstacle)
@@ -48,6 +57,18 @@ mod tests {
 
     fn create_obstacle(id: &str) -> FieldObject {
         FieldObject::new_wall(id)
+    }
+
+    mod tests_of_find_field_object {
+        use super::*;
+
+        #[test]
+        fn it_works() {
+            let mut field_element = FieldElement::new(&(0, 0));
+            field_element.append_field_object(FieldObject::new_wall("a"));
+            assert_eq!(field_element.find_field_object("a").is_some(), true);
+            assert_eq!(field_element.find_field_object("b").is_some(), false);
+        }
     }
 
     mod tests_of_is_impassable {

@@ -27,6 +27,7 @@ impl Controller {
             self.game.last_key_input = key_input;
         }
 
+        // Operate the hero.
         match key_input {
             Some(key_input) => {
                 match key_input {
@@ -34,12 +35,16 @@ impl Controller {
                     Key::Right | Key::Char('l') => move_hero(&mut self.field, &mut self.game, &FourDirection::Right),
                     Key::Down | Key::Char('j') => move_hero(&mut self.field, &mut self.game, &FourDirection::Down),
                     Key::Left | Key::Char('h') => move_hero(&mut self.field, &mut self.game, &FourDirection::Left),
-                    _ => advance_only_time(),
+                    _ => {},
                 };
             },
-            None => advance_only_time(),
+            None => {},
         };
 
+        // Perform state changes over time.
+        self.field.perform_state_changes_over_time();
+
+        // Transfer changes in models to the view model.
         let screen_update = screen_update_builder::build(&self.field, &self.game);
         self.screen.update(&screen_update);
     }

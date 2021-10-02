@@ -12,8 +12,20 @@ pub struct FieldSizeData {
 pub struct Field {
     matrix: Vec<Vec<FieldElement>>,
 }
-
 impl Field {
+    pub fn new(size: &RectangleSize) -> Self {
+        let mut matrix: Vec<Vec<FieldElement>> = Vec::new();
+        for y in 0..size.1 {
+            let mut row: Vec<FieldElement> = Vec::new();
+            for x in 0..size.0 {
+                row.push(FieldElement::new(&(x, y)));
+            }
+            matrix.push(row);
+        }
+        Self {
+            matrix,
+        }
+    }
     pub fn get_size_data(&self) -> FieldSizeData {
         let height = self.matrix.len();
         if height == 0 {
@@ -34,6 +46,9 @@ impl Field {
     pub fn get_field_element(&self, position: &FieldElementPosition) -> &FieldElement {
         &self.matrix[position.1 as usize][position.0 as usize]
     }
+    pub fn get_field_element_mut(&mut self, position: &FieldElementPosition) -> &mut FieldElement {
+        &mut self.matrix[position.1 as usize][position.0 as usize]
+    }
     pub fn find_field_element_by_xy(&self, xy: &XYCoordinates) -> Option<&FieldElement> {
         let field_size_data = self.get_size_data();
         if xy.0 >= 0 && xy.0 <= field_size_data.max_xy.0 &&
@@ -42,9 +57,12 @@ impl Field {
         }
         None
     }
+    pub fn find_field_object(&self, position: &FieldElementPosition, field_object_id: &str) -> Option<&FieldObject> {
+        self.get_field_element(position).find_field_object(field_object_id)
+    }
     // TODO: field_objet の id を重複して発行しない。他の処理は id は重複してない前提にする。
     pub fn place_field_object(&mut self, position: &FieldElementPosition, field_object: FieldObject) {
-        self.matrix[position.1 as usize][position.0 as usize].append_field_object(field_object);
+        self.get_field_element_mut(position).append_field_object(field_object);
     }
     pub fn move_field_object(&mut self, from: &FieldObjectLocation, to: &FieldElementPosition) {
         if &from.0 == to {
@@ -78,20 +96,16 @@ impl Field {
             }
         }
     }
-    pub fn new(size: &RectangleSize) -> Self {
-        let mut matrix: Vec<Vec<FieldElement>> = Vec::new();
-        for y in 0..size.1 {
-            let mut row: Vec<FieldElement> = Vec::new();
-            for x in 0..size.0 {
-                row.push(FieldElement {
-                    position: (x, y),
-                    field_objects: Vec::new(),
-                });
+    pub fn perform_state_changes_over_time(&mut self) {
+        let size = self.get_rectangle_size();
+        for y in 0..size.1 as usize {
+            for x in 0..size.0 as usize {
+                for field_object in &mut self.matrix[y][x].field_objects {
+                    if field_object.can_move() {
+                        field_object.accumulate_movement_power();
+                    }
+                }
             }
-            matrix.push(row);
-        }
-        Self {
-            matrix,
         }
     }
 }
@@ -175,6 +189,53 @@ mod tests {
                     );
                 }
             }
+        }
+    }
+
+    mod tests_of_perform_state_changes_over_time {
+        use super::*;
+
+        fn create_test_movable_field_object(id: &str) -> FieldObject {
+            FieldObject {
+                mobility: 1,
+                ..FieldObject::new_hero(id)
+            }
+        }
+
+        #[test]
+        fn it_works() {
+            let mut field = Field::new(&(2, 1));
+            let a = create_test_movable_field_object("a");
+            let b = create_test_movable_field_object("b");
+            let c = create_test_movable_field_object("c");
+            field.place_field_object(&(0, 0), a);
+            field.place_field_object(&(0, 0), b);
+            field.place_field_object(&(1, 0), c);
+            assert_eq!(
+                field.find_field_object(&(0, 0), "a").unwrap().movement_power,
+                0,
+            );
+            assert_eq!(
+                field.find_field_object(&(0, 0), "b").unwrap().movement_power,
+                0,
+            );
+            assert_eq!(
+                field.find_field_object(&(1, 0), "c").unwrap().movement_power,
+                0,
+            );
+            field.perform_state_changes_over_time();
+            assert_eq!(
+                field.find_field_object(&(0, 0), "a").unwrap().movement_power,
+                1,
+            );
+            assert_eq!(
+                field.find_field_object(&(0, 0), "b").unwrap().movement_power,
+                1,
+            );
+            assert_eq!(
+                field.find_field_object(&(1, 0), "c").unwrap().movement_power,
+                1,
+            );
         }
     }
 }
