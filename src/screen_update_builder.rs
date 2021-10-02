@@ -78,6 +78,7 @@ pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
     }
 
     ScreenUpdate {
+        number_of_frames: game.number_of_frames,
         last_key_input,
         map,
     }

@@ -617,7 +617,8 @@ impl Screen {
 
         // Debug prints
         let debug_prints = format!(
-            "{}",
+            "{}F\n{}",
+            screen_update.number_of_frames,
             screen_update.last_key_input,
         );
         self.write_text(&(70, 0), &(10, 3), &debug_prints, &WriteTextParameters {

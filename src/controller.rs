@@ -20,6 +20,7 @@ pub struct Controller {
 
 impl Controller {
     pub fn handle_main_roop(&mut self, key_input: Option<Key>) {
+        self.game.number_of_frames += 1;
         if key_input.is_some() {
             self.game.last_key_input = key_input;
         }
@@ -63,6 +64,7 @@ impl Controller {
         field.place_field_object(&position_where_hero_is_placed, FieldObject::new_hero(String::from("player")));
 
         let mut game = Game {
+            number_of_frames: 0,
             last_key_input: None,
             operation_target: None,
         };
