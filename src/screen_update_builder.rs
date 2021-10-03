@@ -44,8 +44,8 @@ pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
     // Map
     let map_size: RectangleSize = (21, 13);
     let mut map: Vec<Vec<MapElementUpdate>> = vec![];
-    let hero_xy: Option<XYCoordinates> = match &game.operation_target {
-        Some(operation_target) => Some(translate_rectangle_on_field(&map_size, &operation_target.0)),
+    let hero_xy: Option<XYCoordinates> = match &game.operation_target_location {
+        Some(operation_target_location) => Some(translate_rectangle_on_field(&map_size, &operation_target_location.0)),
         _ => None,
     };
     for map_y in 0..map_size.1 {

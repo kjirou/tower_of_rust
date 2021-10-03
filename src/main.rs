@@ -44,24 +44,18 @@ fn main() {
 
             loop {
                 let now = Instant::now();
-                let key_input = match rx.try_recv() {
-                    Ok(key_input) => Some(key_input),
-                    Err(_) => None,
-                };
+                let key_input = rx.try_recv().ok();
 
                 // Purge extra key inputs in the same frame.
                 while rx.try_recv().is_err() == false {};
 
                 // Quit this application. Only this operation is resolved with priority.
-                match key_input {
-                    Some(key_input) => {
-                        match key_input {
-                            Key::Esc | Key::Ctrl('c') | Key::Char('q') => break,
-                            _ => {},
-                        }
-                    },
-                    _ => {},
-                };
+                if let Some(key_input) = key_input {
+                    match key_input {
+                        Key::Esc | Key::Ctrl('c') => break,
+                        _ => {},
+                    }
+                }
 
                 controller.handle_main_roop(&now, key_input);
 
@@ -86,7 +80,7 @@ fn main() {
             let key_input = key_input.unwrap();
             match key_input {
                 // Quit this application.
-                Key::Esc | Key::Ctrl('c') | Key::Char('q') => {
+                Key::Esc | Key::Ctrl('c') => {
                     tx.send(key_input).unwrap();
                     break;
                 },

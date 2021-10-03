@@ -1,7 +1,7 @@
-pub mod actions;
 pub mod controller;
 pub mod enums;
 pub mod models;
+pub mod operations;
 pub mod screen;
 pub mod screen_update;
 pub mod screen_update_builder;

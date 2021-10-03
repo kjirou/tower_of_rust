@@ -8,8 +8,20 @@ pub struct FieldElement {
 }
 
 impl FieldElement {
+    pub fn new(position: &FieldElementPosition) -> Self {
+        Self {
+            position: position.clone(),
+            field_objects: vec![],
+        }
+    }
     pub fn get_position(&self) -> FieldElementPosition {
         self.position.clone()
+    }
+    pub fn find_field_object(&self, field_object_id: &str) -> Option<&FieldObject> {
+        self.field_objects.iter().find(|&e| &e.id == field_object_id)
+    }
+    pub fn find_field_object_mut(&mut self, field_object_id: &str) -> Option<&mut FieldObject> {
+        self.field_objects.iter_mut().find(|e| e.id == field_object_id)
     }
     pub fn is_impassable(&self) -> bool {
         self.field_objects.iter().any(|e| e.is_obstacle)
@@ -39,15 +51,43 @@ impl FieldElement {
 mod tests {
     use super::*;
 
-    fn create_not_obstacle(id: String) -> FieldObject {
+    fn create_not_obstacle(id: &str) -> FieldObject {
         FieldObject {
             is_obstacle: false,
             ..FieldObject::new_wall(id)
         }
     }
 
-    fn create_obstacle(id: String) -> FieldObject {
+    fn create_obstacle(id: &str) -> FieldObject {
         FieldObject::new_wall(id)
+    }
+
+    mod tests_of_find_field_object {
+        use super::*;
+
+        #[test]
+        fn it_works() {
+            let mut field_element = FieldElement::new(&(0, 0));
+            field_element.append_field_object(FieldObject::new_wall("a"));
+            assert_eq!(field_element.find_field_object("a").is_some(), true);
+            assert_eq!(field_element.find_field_object("b").is_some(), false);
+        }
+    }
+
+    mod tests_of_find_field_object_mut {
+        use super::*;
+
+        #[test]
+        fn it_works() {
+            let mut field_element = FieldElement::new(&(0, 0));
+            field_element.append_field_object(FieldObject::new_wall("a"));
+            assert_eq!(field_element.find_field_object_mut("b").is_some(), false);
+            let a = field_element.find_field_object_mut("a");
+            assert_eq!(a.is_some(), true);
+            let a = a.unwrap();
+            a.id = String::from("aa");
+            assert_eq!(a.id, String::from("aa"));
+        }
     }
 
     mod tests_of_is_impassable {
@@ -62,7 +102,7 @@ mod tests {
         fn it_returns_true_when_it_have_an_obstacle() {
             let field_element = FieldElement {
                 field_objects: vec![
-                    create_obstacle(String::from("a")),
+                    create_obstacle("a"),
                 ],
                 ..Default::default()
             };
@@ -72,7 +112,7 @@ mod tests {
         fn it_returns_false_when_it_have_a_not_obstacle() {
             let field_element = FieldElement {
                 field_objects: vec![
-                    create_not_obstacle(String::from("a")),
+                    create_not_obstacle("a"),
                 ],
                 ..Default::default()
             };
@@ -87,13 +127,13 @@ mod tests {
         fn it_can_move_a_field_object_to_the_passable_field_element() {
             let mut from = FieldElement {
                 field_objects: vec![
-                    create_obstacle(String::from("a")),
+                    create_obstacle("a"),
                 ],
                 ..Default::default()
             };
             let mut to = FieldElement {
                 field_objects: vec![
-                    create_not_obstacle(String::from("b")),
+                    create_not_obstacle("b"),
                 ],
                 ..Default::default()
             };
@@ -107,13 +147,13 @@ mod tests {
         fn it_panics_when_the_destination_field_element_is_impassable() {
             let mut from = FieldElement {
                 field_objects: vec![
-                    create_obstacle(String::from("a")),
+                    create_obstacle("a"),
                 ],
                 ..Default::default()
             };
             let mut to = FieldElement {
                 field_objects: vec![
-                    create_obstacle(String::from("b")),
+                    create_obstacle("b"),
                 ],
                 ..Default::default()
             };
