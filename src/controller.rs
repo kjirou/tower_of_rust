@@ -2,11 +2,11 @@ use rand;
 use std::time::Instant;
 use termion::event::Key;
 
-use crate::actions::*;
 use crate::enums::FourDirection;
 use crate::models::field::Field;
 use crate::models::field_object::FieldObject;
 use crate::models::game::Game;
+use crate::operations::*;
 use crate::screen::Screen;
 use crate::screen_update_builder;
 use crate::types::{GetRandom, RectangleSize};
