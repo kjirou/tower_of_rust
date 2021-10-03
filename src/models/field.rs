@@ -60,6 +60,9 @@ impl Field {
     pub fn find_field_object(&self, location: &FieldObjectLocation) -> Option<&FieldObject> {
         self.get_field_element(&location.0).find_field_object(&location.1)
     }
+    pub fn find_field_object_mut(&mut self, location: &FieldObjectLocation) -> Option<&mut FieldObject> {
+        self.get_field_element_mut(&location.0).find_field_object_mut(&location.1)
+    }
     // TODO: field_objet の id を重複して発行しない。他の処理は id は重複してない前提にする。
     pub fn place_field_object(&mut self, position: &FieldElementPosition, field_object: FieldObject) {
         self.get_field_element_mut(position).append_field_object(field_object);

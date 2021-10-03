@@ -20,6 +20,9 @@ impl FieldElement {
     pub fn find_field_object(&self, field_object_id: &str) -> Option<&FieldObject> {
         self.field_objects.iter().find(|&e| &e.id == field_object_id)
     }
+    pub fn find_field_object_mut(&mut self, field_object_id: &str) -> Option<&mut FieldObject> {
+        self.field_objects.iter_mut().find(|e| e.id == field_object_id)
+    }
     pub fn is_impassable(&self) -> bool {
         self.field_objects.iter().any(|e| e.is_obstacle)
     }
@@ -68,6 +71,22 @@ mod tests {
             field_element.append_field_object(FieldObject::new_wall("a"));
             assert_eq!(field_element.find_field_object("a").is_some(), true);
             assert_eq!(field_element.find_field_object("b").is_some(), false);
+        }
+    }
+
+    mod tests_of_find_field_object_mut {
+        use super::*;
+
+        #[test]
+        fn it_works() {
+            let mut field_element = FieldElement::new(&(0, 0));
+            field_element.append_field_object(FieldObject::new_wall("a"));
+            assert_eq!(field_element.find_field_object_mut("b").is_some(), false);
+            let a = field_element.find_field_object_mut("a");
+            assert_eq!(a.is_some(), true);
+            let a = a.unwrap();
+            a.id = String::from("aa");
+            assert_eq!(a.id, String::from("aa"));
         }
     }
 

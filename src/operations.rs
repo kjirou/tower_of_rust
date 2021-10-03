@@ -9,7 +9,10 @@ pub fn move_hero(field: &mut Field, game: &mut Game, direction: &FourDirection) 
         if let Ok(position) = translate_position_by_direction(&field.get_rectangle_size(), &operation_target.0, direction) {
             let destination = field.get_field_element(&position);
             if !destination.is_impassable() {
-                move_operation_target(field, game, &position);
+                let operation_target = get_operation_target(field, game);
+                if operation_target.can_step() {
+                    move_operation_target_for_one_step(field, game, &position);
+                }
             }
         }
     }

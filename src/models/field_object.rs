@@ -40,7 +40,7 @@ impl FieldObject {
         self.mobility > 0
     }
     pub fn can_step(&self) -> bool {
-        self.mobility >= MOVEMENT_POWER_PER_STEP
+        self.movement_power >= MOVEMENT_POWER_PER_STEP
     }
     pub fn accumulate_movement_power(&mut self) {
         self.movement_power = cmp::min(self.movement_power + self.mobility, MAX_MOVEMENT_POWER);
