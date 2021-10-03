@@ -57,8 +57,8 @@ impl Field {
         }
         None
     }
-    pub fn find_field_object(&self, position: &FieldElementPosition, field_object_id: &str) -> Option<&FieldObject> {
-        self.get_field_element(position).find_field_object(field_object_id)
+    pub fn find_field_object(&self, location: &FieldObjectLocation) -> Option<&FieldObject> {
+        self.get_field_element(&location.0).find_field_object(&location.1)
     }
     // TODO: field_objet の id を重複して発行しない。他の処理は id は重複してない前提にする。
     pub fn place_field_object(&mut self, position: &FieldElementPosition, field_object: FieldObject) {
@@ -212,28 +212,28 @@ mod tests {
             field.place_field_object(&(0, 0), b);
             field.place_field_object(&(1, 0), c);
             assert_eq!(
-                field.find_field_object(&(0, 0), "a").unwrap().movement_power,
+                field.find_field_object(&((0, 0), String::from("a"))).unwrap().movement_power,
                 0,
             );
             assert_eq!(
-                field.find_field_object(&(0, 0), "b").unwrap().movement_power,
+                field.find_field_object(&((0, 0), String::from("b"))).unwrap().movement_power,
                 0,
             );
             assert_eq!(
-                field.find_field_object(&(1, 0), "c").unwrap().movement_power,
+                field.find_field_object(&((1, 0), String::from("c"))).unwrap().movement_power,
                 0,
             );
             field.perform_state_changes_over_time();
             assert_eq!(
-                field.find_field_object(&(0, 0), "a").unwrap().movement_power,
+                field.find_field_object(&((0, 0), String::from("a"))).unwrap().movement_power,
                 1,
             );
             assert_eq!(
-                field.find_field_object(&(0, 0), "b").unwrap().movement_power,
+                field.find_field_object(&((0, 0), String::from("b"))).unwrap().movement_power,
                 1,
             );
             assert_eq!(
-                field.find_field_object(&(1, 0), "c").unwrap().movement_power,
+                field.find_field_object(&((1, 0), String::from("c"))).unwrap().movement_power,
                 1,
             );
         }
