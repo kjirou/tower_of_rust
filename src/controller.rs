@@ -60,18 +60,15 @@ impl Controller {
         }
 
         // Operate the target.
-        match key_input {
-            Some(key_input) => {
-                match key_input {
-                    Key::Up | Key::Char('k') => move_operation_target_for_one_step(&mut self.field, &mut self.game, &FourDirection::Up),
-                    Key::Right | Key::Char('l') => move_operation_target_for_one_step(&mut self.field, &mut self.game, &FourDirection::Right),
-                    Key::Down | Key::Char('j') => move_operation_target_for_one_step(&mut self.field, &mut self.game, &FourDirection::Down),
-                    Key::Left | Key::Char('h') => move_operation_target_for_one_step(&mut self.field, &mut self.game, &FourDirection::Left),
-                    _ => {},
-                };
-            },
-            None => {},
-        };
+        if let Some(key_input) = key_input {
+            match key_input {
+                Key::Up | Key::Char('k') => move_operation_target_for_one_step(&mut self.field, &mut self.game, &FourDirection::Up),
+                Key::Right | Key::Char('l') => move_operation_target_for_one_step(&mut self.field, &mut self.game, &FourDirection::Right),
+                Key::Down | Key::Char('j') => move_operation_target_for_one_step(&mut self.field, &mut self.game, &FourDirection::Down),
+                Key::Left | Key::Char('h') => move_operation_target_for_one_step(&mut self.field, &mut self.game, &FourDirection::Left),
+                _ => {},
+            }
+        }
 
         // Perform state changes over time.
         self.field.perform_state_changes_over_time();
