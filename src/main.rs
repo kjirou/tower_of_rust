@@ -56,7 +56,7 @@ fn main() {
                 match key_input {
                     Some(key_input) => {
                         match key_input {
-                            Key::Esc | Key::Ctrl('c') | Key::Char('q') => break,
+                            Key::Esc | Key::Ctrl('c') => break,
                             _ => {},
                         }
                     },
@@ -86,7 +86,7 @@ fn main() {
             let key_input = key_input.unwrap();
             match key_input {
                 // Quit this application.
-                Key::Esc | Key::Ctrl('c') | Key::Char('q') => {
+                Key::Esc | Key::Ctrl('c') => {
                     tx.send(key_input).unwrap();
                     break;
                 },
