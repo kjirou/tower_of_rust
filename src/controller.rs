@@ -21,7 +21,7 @@ pub struct Controller {
 
 impl Controller {
     pub fn new() -> Self {
-        let field_size: RectangleSize = (120, 36);
+        let field_size: RectangleSize = (80, 24);
 
         let get_random: GetRandom = || { rand::random::<f64>() };
 
