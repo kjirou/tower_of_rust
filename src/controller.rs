@@ -38,10 +38,10 @@ impl Controller {
 
         let mut field = Field::new(&field_size);
         field.import_dungeon(&dungeon);
-        field.place_field_object(&position_where_hero_is_placed, FieldObject::new_hero("player"));
+        field.place_field_object(&position_where_hero_is_placed, FieldObject::new_hero("hero"));
 
         let mut game = Game::new();
-        game.operation_target_location = Some((position_where_hero_is_placed, String::from("player")));
+        game.operation_target_location = Some((position_where_hero_is_placed, String::from("hero")));
 
         let mut screen = Screen::new();
         screen.update(&screen_update_builder::build(&field, &game));
@@ -59,7 +59,7 @@ impl Controller {
             self.game.last_key_input = key_input;
         }
 
-        // Operate the hero.
+        // Operate the target.
         match key_input {
             Some(key_input) => {
                 match key_input {
