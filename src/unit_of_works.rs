@@ -4,18 +4,18 @@ use crate::models::game::Game;
 use crate::types::FieldElementPosition;
 
 pub fn get_operation_target<'a>(field: &'a Field, game: &'a Game) -> &'a FieldObject {
-    field.find_field_object(&game.operation_target.clone().unwrap()).unwrap()
+    field.find_field_object(&game.operation_target_location.clone().unwrap()).unwrap()
 }
 
 fn get_operation_target_mut<'a>(field: &'a mut Field, game: &'a Game) -> &'a mut FieldObject {
-    field.find_field_object_mut(&game.operation_target.clone().unwrap()).unwrap()
+    field.find_field_object_mut(&game.operation_target_location.clone().unwrap()).unwrap()
 }
 
 fn change_placement_of_operation_target(field: &mut Field, game: &mut Game, to: &FieldElementPosition) {
-    match &game.operation_target {
-        Some(operation_target) => {
-            field.move_field_object(operation_target, to);
-            game.operation_target = Some(((to.0, to.1), operation_target.1.clone()));
+    match &game.operation_target_location {
+        Some(operation_target_location) => {
+            field.move_field_object(operation_target_location, to);
+            game.operation_target_location = Some(((to.0, to.1), operation_target_location.1.clone()));
         },
         None => {
             panic!("There is no operation target.");

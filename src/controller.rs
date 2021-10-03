@@ -71,7 +71,7 @@ impl Controller {
         field.place_field_object(&position_where_hero_is_placed, FieldObject::new_hero("player"));
 
         let mut game = Game::new();
-        game.operation_target = Some((position_where_hero_is_placed, String::from("player")));
+        game.operation_target_location = Some((position_where_hero_is_placed, String::from("player")));
 
         let mut screen = Screen::new();
         screen.update(&screen_update_builder::build(&field, &game));

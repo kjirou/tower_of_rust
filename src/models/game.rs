@@ -8,8 +8,7 @@ pub struct Game {
     last_fps_calculation: Option<(Instant, u64, f64)>,
     pub last_key_input: Option<Key>,
     pub number_of_frames: u64,
-    // TODO: operation_target_location にする。
-    pub operation_target: Option<FieldObjectLocation>,
+    pub operation_target_location: Option<FieldObjectLocation>,
 }
 impl Game {
     pub fn new() -> Self {
@@ -17,7 +16,7 @@ impl Game {
             number_of_frames: 0,
             last_fps_calculation: None,
             last_key_input: None,
-            operation_target: None,
+            operation_target_location: None,
         }
     }
     pub fn get_fps(&self) -> f64 {
