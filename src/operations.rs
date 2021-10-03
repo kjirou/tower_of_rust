@@ -5,18 +5,12 @@ use crate::unit_of_works::*;
 use crate::utils::{translate_position_by_direction};
 
 pub fn move_hero(field: &mut Field, game: &mut Game, direction: &FourDirection) {
-    match &game.operation_target {
-        Some(operation_target) => {
-            match translate_position_by_direction(&field.get_rectangle_size(), &operation_target.0, direction) {
-                Ok(position) => {
-                    let destination = field.get_field_element(&position);
-                    if !destination.is_impassable() {
-                        move_operation_target(field, game, &position);
-                    }
-                },
-                Err(_) => {},
-            };
-        },
-        None => {},
-    };
+    if let Some(operation_target) = &game.operation_target {
+        if let Ok(position) = translate_position_by_direction(&field.get_rectangle_size(), &operation_target.0, direction) {
+            let destination = field.get_field_element(&position);
+            if !destination.is_impassable() {
+                move_operation_target(field, game, &position);
+            }
+        }
+    }
 }
