@@ -23,7 +23,7 @@ fn change_placement_of_operation_target(field: &mut Field, game: &mut Game, to: 
     };
 }
 
-pub fn move_operation_target_for_one_step(field: &mut Field, game: &mut Game, to: &FieldElementPosition) {
+pub fn move_operation_target_by_consuming_its_movement_power(field: &mut Field, game: &mut Game, to: &FieldElementPosition) {
     change_placement_of_operation_target(field, game, to);
     get_operation_target_mut(field, game).consume_movement_power_for_step();
 }

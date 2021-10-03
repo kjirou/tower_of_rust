@@ -62,10 +62,10 @@ impl Controller {
         match key_input {
             Some(key_input) => {
                 match key_input {
-                    Key::Up | Key::Char('k') => move_hero(&mut self.field, &mut self.game, &FourDirection::Up),
-                    Key::Right | Key::Char('l') => move_hero(&mut self.field, &mut self.game, &FourDirection::Right),
-                    Key::Down | Key::Char('j') => move_hero(&mut self.field, &mut self.game, &FourDirection::Down),
-                    Key::Left | Key::Char('h') => move_hero(&mut self.field, &mut self.game, &FourDirection::Left),
+                    Key::Up | Key::Char('k') => move_operation_target_for_one_step(&mut self.field, &mut self.game, &FourDirection::Up),
+                    Key::Right | Key::Char('l') => move_operation_target_for_one_step(&mut self.field, &mut self.game, &FourDirection::Right),
+                    Key::Down | Key::Char('j') => move_operation_target_for_one_step(&mut self.field, &mut self.game, &FourDirection::Down),
+                    Key::Left | Key::Char('h') => move_operation_target_for_one_step(&mut self.field, &mut self.game, &FourDirection::Left),
                     _ => {},
                 };
             },
