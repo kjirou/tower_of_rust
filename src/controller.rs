@@ -74,6 +74,11 @@ impl Controller {
                 Key::Right | Key::Char('l') => moves_one_step(&mut self.field, &mut self.game, &FourDirection::Right),
                 Key::Down | Key::Char('j') => moves_one_step(&mut self.field, &mut self.game, &FourDirection::Down),
                 Key::Left | Key::Char('h') => moves_one_step(&mut self.field, &mut self.game, &FourDirection::Left),
+                Key::Ctrl('k') => changes_direction(&mut self.field, &mut self.game, &FourDirection::Up),
+                Key::Ctrl('l') => changes_direction(&mut self.field, &mut self.game, &FourDirection::Right),
+                // TODO: 自分の PC で Ctrl + j を入力すると、Char('\n') と解釈されるため分岐している。まず他の PC で検証するのが良さそう。
+                Key::Ctrl('j') | Key::Char('\n') => changes_direction(&mut self.field, &mut self.game, &FourDirection::Down),
+                Key::Ctrl('h') => changes_direction(&mut self.field, &mut self.game, &FourDirection::Left),
                 _ => {},
             }
         }

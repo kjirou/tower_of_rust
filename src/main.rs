@@ -84,10 +84,9 @@ fn main() {
                     tx.send(key_input).unwrap();
                     break;
                 },
-                Key::Up | Key::Right | Key::Down | Key::Left => {
+                Key::Up | Key::Right | Key::Down | Key::Left| Key::Ctrl(_) | Key::Char(_) => {
                     tx.send(key_input).unwrap();
                 },
-                Key::Char(key_input) => tx.send(Key::Char(key_input)).unwrap(),
                 _ => {},
             };
         }

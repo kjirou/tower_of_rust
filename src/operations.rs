@@ -1,11 +1,17 @@
 use crate::enums::FourDirection;
 use crate::id_generator::IdGenerator;
-use crate::mediators::{get_operation_target};
+use crate::mediators::{find_operation_target_mut, get_operation_target};
 use crate::models::field::Field;
 use crate::models::field_effect::FieldEffect;
 use crate::models::game::Game;
 use crate::unit_of_works::*;
 use crate::utils::{translate_position_by_direction};
+
+pub fn changes_direction(field: &mut Field, game: &mut Game, direction: &FourDirection) {
+    if let Some(operation_target) = find_operation_target_mut(field, game) {
+        operation_target.direction = direction.clone();
+    }
+}
 
 pub fn moves_one_step(field: &mut Field, game: &mut Game, direction: &FourDirection) {
     if let Some(operation_target_location) = &game.operation_target_location {
