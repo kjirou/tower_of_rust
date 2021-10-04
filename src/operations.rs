@@ -1,10 +1,11 @@
 use crate::enums::FourDirection;
 use crate::models::field::Field;
+use crate::models::field_effect::FieldEffect;
 use crate::models::game::Game;
 use crate::unit_of_works::*;
 use crate::utils::{translate_position_by_direction};
 
-pub fn move_operation_target_for_one_step(field: &mut Field, game: &mut Game, direction: &FourDirection) {
+pub fn moves_one_step(field: &mut Field, game: &mut Game, direction: &FourDirection) {
     if let Some(operation_target_location) = &game.operation_target_location {
         if let Ok(position) = translate_position_by_direction(&field.get_rectangle_size(), &operation_target_location.0, direction) {
             let destination = field.get_field_element(&position);
@@ -14,6 +15,16 @@ pub fn move_operation_target_for_one_step(field: &mut Field, game: &mut Game, di
                     move_operation_target_by_consuming_its_movement_power(field, game, &position);
                 }
             }
+        }
+    }
+}
+
+// TODO: 向いている方向へ効果を配置する。
+pub fn makes_attack(field: &mut Field, game: &Game) {
+    if let Some(operation_target_location) = &game.operation_target_location {
+        if let Ok(position) = translate_position_by_direction(&field.get_rectangle_size(), &operation_target_location.0, &FourDirection::Up) {
+            // TODO: IDを重複しない。
+            field.place_field_effect(&position, FieldEffect::new("a"));
         }
     }
 }

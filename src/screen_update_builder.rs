@@ -10,7 +10,7 @@ use crate::utils::{translate_rectangle_on_field};
 fn create_field_element_display(field_element: &FieldElement) -> MapElementUpdate {
     let mut symbol = '.';
     let mut foreground = ColorKind::LightBlack;
-    let background = ColorKind::Black;
+    let mut background = ColorKind::Black;
 
     if field_element.field_objects.len() > 0 {
         let first = &field_element.field_objects[0];
@@ -24,6 +24,12 @@ fn create_field_element_display(field_element: &FieldElement) -> MapElementUpdat
                 foreground = ColorKind::LightBlack;
             },
         }
+    }
+
+    // TODO: 自分の攻撃と敵の攻撃で着色する。
+    // TODO: 自分の攻撃と敵の攻撃が重なった時は自分側の着色を優先する。
+    if field_element.field_effects.len() > 0 {
+        background = ColorKind::LightCyan;
     }
 
     MapElementUpdate {

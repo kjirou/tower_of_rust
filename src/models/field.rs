@@ -1,3 +1,4 @@
+use crate::models::field_effect::FieldEffect;
 use crate::models::field_element::FieldElement;
 use crate::models::field_object::FieldObject;
 use crate::types::{FieldElementPosition, FieldObjectLocation, RectangleSize, XYCoordinates};
@@ -78,6 +79,10 @@ impl Field {
             let to_field_element = &mut *to_field_element_pointer;
             from_field_element.move_field_object_to_another(&from.1, to_field_element);
         }
+    }
+    // TODO: field_effect の id を重複して発行しない。他の処理は id は重複してない前提にする。
+    pub fn place_field_effect(&mut self, position: &FieldElementPosition, field_effect: FieldEffect) {
+        self.get_field_element_mut(position).append_field_effect(field_effect);
     }
     pub fn import_dungeon(&mut self, dungeon: &Dungeon) {
         let size_data = self.get_size_data();
