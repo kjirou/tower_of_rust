@@ -1,3 +1,4 @@
+use crate::id_generator::IdGenerator;
 use crate::models::field_effect::FieldEffect;
 use crate::models::field_element::FieldElement;
 use crate::models::field_object::FieldObject;
@@ -64,7 +65,6 @@ impl Field {
     pub fn find_field_object_mut(&mut self, location: &FieldObjectLocation) -> Option<&mut FieldObject> {
         self.get_field_element_mut(&location.0).find_field_object_mut(&location.1)
     }
-    // TODO: field_objet の id を重複して発行しない。他の処理は id は重複してない前提にする。
     pub fn place_field_object(&mut self, position: &FieldElementPosition, field_object: FieldObject) {
         self.get_field_element_mut(position).append_field_object(field_object);
     }
@@ -80,11 +80,10 @@ impl Field {
             from_field_element.move_field_object_to_another(&from.1, to_field_element);
         }
     }
-    // TODO: field_effect の id を重複して発行しない。他の処理は id は重複してない前提にする。
     pub fn place_field_effect(&mut self, position: &FieldElementPosition, field_effect: FieldEffect) {
         self.get_field_element_mut(position).append_field_effect(field_effect);
     }
-    pub fn import_dungeon(&mut self, dungeon: &Dungeon) {
+    pub fn import_dungeon(&mut self, id_generator: &mut IdGenerator, dungeon: &Dungeon) {
         let size_data = self.get_size_data();
         if size_data.size != dungeon.get_size() {
             panic!("The sizes of the field and the dungeon do not match.");
@@ -95,9 +94,7 @@ impl Field {
                 let xu = x as usize;
                 match dungeon.matrix[yu][xu].kind {
                     DungeonCellKind::Wall | DungeonCellKind::Blank => {
-                        // TODO: id の生成手順を管理する。
-                        let wall_id = format!("wall-{}-{}", x, y);
-                        self.place_field_object(&(x, y), FieldObject::new_wall(&wall_id));
+                        self.place_field_object(&(x, y), FieldObject::new_wall(&id_generator.generate_for_wall()));
                     },
                     _ => {},
                 };

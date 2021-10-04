@@ -1,5 +1,6 @@
 #[derive(Debug)]
 pub struct FieldEffect {
+    /// It is unique throughout the application.
     id: String,
 }
 impl FieldEffect {

@@ -12,6 +12,7 @@ pub enum DisplayKind {
 #[derive(Debug)]
 pub struct FieldObject {
     pub display_kind: DisplayKind,
+    /// It is unique throughout the application.
     pub id: String,
     pub is_obstacle: bool,
     pub mobility: u16,

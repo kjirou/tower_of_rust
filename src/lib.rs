@@ -1,5 +1,6 @@
 pub mod controller;
 pub mod enums;
+pub mod id_generator;
 pub mod models;
 pub mod operations;
 pub mod screen;

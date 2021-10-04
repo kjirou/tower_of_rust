@@ -1,4 +1,5 @@
 use crate::enums::FourDirection;
+use crate::id_generator::IdGenerator;
 use crate::models::field::Field;
 use crate::models::field_effect::FieldEffect;
 use crate::models::game::Game;
@@ -20,11 +21,10 @@ pub fn moves_one_step(field: &mut Field, game: &mut Game, direction: &FourDirect
 }
 
 // TODO: 向いている方向へ効果を配置する。
-pub fn makes_attack(field: &mut Field, game: &Game) {
+pub fn makes_attack(id_generator: &mut IdGenerator, field: &mut Field, game: &Game) {
     if let Some(operation_target_location) = &game.operation_target_location {
         if let Ok(position) = translate_position_by_direction(&field.get_rectangle_size(), &operation_target_location.0, &FourDirection::Up) {
-            // TODO: IDを重複しない。
-            field.place_field_effect(&position, FieldEffect::new("a"));
+            field.place_field_effect(&position, FieldEffect::new(&id_generator.generate_for_field_effect()));
         }
     }
 }
