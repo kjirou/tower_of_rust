@@ -1,4 +1,5 @@
 use crate::enums::{ColorKind};
+use crate::mediators::{find_operation_target};
 use crate::models::field::Field;
 use crate::models::field_element::FieldElement;
 use crate::models::field_object::DisplayKind;
@@ -10,7 +11,7 @@ use crate::utils::{translate_rectangle_on_field};
 fn create_field_element_display(field_element: &FieldElement) -> MapElementUpdate {
     let mut symbol = '.';
     let mut foreground = ColorKind::LightBlack;
-    let background = ColorKind::Black;
+    let mut background = ColorKind::Black;
 
     if field_element.field_objects.len() > 0 {
         let first = &field_element.field_objects[0];
@@ -26,6 +27,12 @@ fn create_field_element_display(field_element: &FieldElement) -> MapElementUpdat
         }
     }
 
+    // TODO: 自分の攻撃と敵の攻撃で着色する。
+    // TODO: 自分の攻撃と敵の攻撃が重なった時は自分側の着色を優先する。
+    if field_element.field_effects.len() > 0 {
+        background = ColorKind::LightCyan;
+    }
+
     MapElementUpdate {
         symbol,
         foreground,
@@ -34,26 +41,21 @@ fn create_field_element_display(field_element: &FieldElement) -> MapElementUpdat
 }
 
 pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
-    // Last Key Input
-    let last_key_input: String = match &game.last_key_input {
-        // TODO: 雑。不慮の文字が入りうる。
-        Some(key_input) => format!("{:?}", key_input),
-        None => String::from("None"),
-    };
+    let operation_target = find_operation_target(field, game);
 
     // Map
     let map_size: RectangleSize = (21, 13);
     let mut map: Vec<Vec<MapElementUpdate>> = vec![];
-    let hero_xy: Option<XYCoordinates> = match &game.operation_target_location {
+    let operation_target_xy: Option<XYCoordinates> = match &game.operation_target_location {
         Some(operation_target_location) => Some(translate_rectangle_on_field(&map_size, &operation_target_location.0)),
         _ => None,
     };
     for map_y in 0..map_size.1 {
         let mut map_row: Vec<MapElementUpdate> = vec![];
         for map_x in 0..map_size.0 {
-            let map_element_update: MapElementUpdate = match hero_xy {
-                Some(hero_xy) => {
-                    let xy = (hero_xy.0 + map_x as i32, hero_xy.1 + map_y as i32);
+            let map_element_update: MapElementUpdate = match operation_target_xy {
+                Some(operation_target_xy) => {
+                    let xy = (operation_target_xy.0 + map_x as i32, operation_target_xy.1 + map_y as i32);
                     let field_element = field.find_field_element_by_xy(&xy);
                     match field_element {
                         Some(field_element) => create_field_element_display(field_element),
@@ -77,10 +79,25 @@ pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
         map.push(map_row);
     }
 
+    // The last key input
+    let last_key_input: String = match &game.last_key_input {
+        // TODO: 雑。不慮の文字が入りうる。
+        Some(key_input) => format!("{:?}", key_input),
+        None => String::from("None"),
+    };
+
+    // The direction of the operation target
+    let direction_of_operation_target: String = if let Some(operation_target) = operation_target {
+        operation_target.direction.to_string()
+    } else {
+        String::from("None")
+    };
+
     ScreenUpdate {
         number_of_frames: game.number_of_frames,
         fps: game.get_fps(),
         last_key_input,
+        direction_of_operation_target,
         map,
     }
 }

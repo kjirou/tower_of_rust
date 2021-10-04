@@ -617,12 +617,13 @@ impl Screen {
 
         // Debug prints
         let debug_prints = format!(
-            "{}F\n{:.2}FPS\n{}",
+            "{}F\n{:.2}FPS\n{}\n{}",
             screen_update.number_of_frames,
             screen_update.fps,
             screen_update.last_key_input,
+            screen_update.direction_of_operation_target,
         );
-        self.write_text(&(70, 0), &(10, 3), &debug_prints, &WriteTextParameters {
+        self.write_text(&(70, 0), &(10, 4), &debug_prints, &WriteTextParameters {
             auto_line_break: false,
             symbol_to_padding: Some(' '),
             ..Default::default()

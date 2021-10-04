@@ -1,17 +1,19 @@
+use crate::models::field_effect::FieldEffect;
 use crate::models::field_object::FieldObject;
 use crate::types::FieldElementPosition;
 
 #[derive(Debug, Default)]
 pub struct FieldElement {
+    pub field_effects: Vec<FieldEffect>,
     pub field_objects: Vec<FieldObject>,
-    pub position: FieldElementPosition,
+    position: FieldElementPosition,
 }
-
 impl FieldElement {
     pub fn new(position: &FieldElementPosition) -> Self {
         Self {
             position: position.clone(),
             field_objects: vec![],
+            field_effects: vec![],
         }
     }
     pub fn get_position(&self) -> FieldElementPosition {
@@ -44,6 +46,9 @@ impl FieldElement {
         }
         let moved = self.remove_field_object(id);
         to.append_field_object(moved);
+    }
+    pub fn append_field_effect(&mut self, field_effect: FieldEffect) {
+        self.field_effects.push(field_effect);
     }
 }
 

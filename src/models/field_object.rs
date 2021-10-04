@@ -1,5 +1,7 @@
 use std::cmp;
 
+use crate::enums::FourDirection;
+
 const MOVEMENT_POWER_PER_STEP: u16 = 216;
 const MAX_MOVEMENT_POWER: u16 = MOVEMENT_POWER_PER_STEP * 4;
 
@@ -11,7 +13,9 @@ pub enum DisplayKind {
 
 #[derive(Debug)]
 pub struct FieldObject {
+    pub direction: FourDirection,
     pub display_kind: DisplayKind,
+    /// It is unique throughout the application.
     pub id: String,
     pub is_obstacle: bool,
     pub mobility: u16,
@@ -25,6 +29,7 @@ impl FieldObject {
             is_obstacle: true,
             mobility: 72,
             movement_power: 0,
+            direction: FourDirection::Up,
         }
     }
     pub fn new_wall(id: &str) -> Self {
@@ -34,6 +39,7 @@ impl FieldObject {
             is_obstacle: true,
             mobility: 0,
             movement_power: 0,
+            direction: FourDirection::Up,
         }
     }
     pub fn can_move(&self) -> bool {
@@ -64,6 +70,7 @@ mod tests {
             is_obstacle: true,
             mobility: 1,
             movement_power: 0,
+            direction: FourDirection::Up,
         }
     }
 
