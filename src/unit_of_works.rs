@@ -1,15 +1,8 @@
+use crate::enums::FourDirection;
+use crate::mediators::*;
 use crate::models::field::Field;
-use crate::models::field_object::FieldObject;
 use crate::models::game::Game;
 use crate::types::FieldElementPosition;
-
-pub fn get_operation_target<'a>(field: &'a Field, game: &'a Game) -> &'a FieldObject {
-    field.find_field_object(&game.operation_target_location.clone().unwrap()).unwrap()
-}
-
-fn get_operation_target_mut<'a>(field: &'a mut Field, game: &'a Game) -> &'a mut FieldObject {
-    field.find_field_object_mut(&game.operation_target_location.clone().unwrap()).unwrap()
-}
 
 fn change_placement_of_operation_target(field: &mut Field, game: &mut Game, to: &FieldElementPosition) {
     match &game.operation_target_location {
@@ -23,7 +16,11 @@ fn change_placement_of_operation_target(field: &mut Field, game: &mut Game, to: 
     };
 }
 
-pub fn move_operation_target_by_consuming_its_movement_power(field: &mut Field, game: &mut Game, to: &FieldElementPosition) {
+pub fn move_operation_target_by_consuming_its_movement_power(
+    field: &mut Field, game: &mut Game, to: &FieldElementPosition, direction: &FourDirection,
+) {
     change_placement_of_operation_target(field, game, to);
-    get_operation_target_mut(field, game).consume_movement_power_for_step();
+    let operation_target = get_operation_target_mut(field, game);
+    operation_target.consume_movement_power_for_step();
+    operation_target.direction = direction.clone();
 }

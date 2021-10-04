@@ -9,6 +9,7 @@ pub struct MapElementUpdate {
 }
 
 pub struct ScreenUpdate {
+    pub direction_of_operation_target: String,
     pub fps: f64,
     pub last_key_input: String,
     pub number_of_frames: u64,

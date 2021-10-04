@@ -1,5 +1,6 @@
 use crate::enums::FourDirection;
 use crate::id_generator::IdGenerator;
+use crate::mediators::{get_operation_target};
 use crate::models::field::Field;
 use crate::models::field_effect::FieldEffect;
 use crate::models::game::Game;
@@ -13,7 +14,7 @@ pub fn moves_one_step(field: &mut Field, game: &mut Game, direction: &FourDirect
             if !destination.is_impassable() {
                 let operation_target = get_operation_target(field, game);
                 if operation_target.can_step() {
-                    move_operation_target_by_consuming_its_movement_power(field, game, &position);
+                    move_operation_target_by_consuming_its_movement_power(field, game, &position, direction);
                 }
             }
         }

@@ -1,4 +1,5 @@
 use crate::enums::{ColorKind};
+use crate::mediators::{find_operation_target};
 use crate::models::field::Field;
 use crate::models::field_element::FieldElement;
 use crate::models::field_object::DisplayKind;
@@ -40,12 +41,7 @@ fn create_field_element_display(field_element: &FieldElement) -> MapElementUpdat
 }
 
 pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
-    // Last Key Input
-    let last_key_input: String = match &game.last_key_input {
-        // TODO: 雑。不慮の文字が入りうる。
-        Some(key_input) => format!("{:?}", key_input),
-        None => String::from("None"),
-    };
+    let operation_target = find_operation_target(field, game);
 
     // Map
     let map_size: RectangleSize = (21, 13);
@@ -83,10 +79,25 @@ pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
         map.push(map_row);
     }
 
+    // The last key input
+    let last_key_input: String = match &game.last_key_input {
+        // TODO: 雑。不慮の文字が入りうる。
+        Some(key_input) => format!("{:?}", key_input),
+        None => String::from("None"),
+    };
+
+    // The direction of the operation target
+    let direction_of_operation_target: String = if let Some(operation_target) = operation_target {
+        operation_target.direction.to_string()
+    } else {
+        String::from("None")
+    };
+
     ScreenUpdate {
         number_of_frames: game.number_of_frames,
         fps: game.get_fps(),
         last_key_input,
+        direction_of_operation_target,
         map,
     }
 }
