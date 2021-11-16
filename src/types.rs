@@ -23,3 +23,8 @@ pub type FieldElementPosition = (u32, u32);
 /// 
 /// It consists of (`FieldElementPosition`, id_of_field_object).
 pub type FieldObjectLocation = (FieldElementPosition, String);
+
+/// A location of a `FieldEffect`.
+/// 
+/// It consists of (`FieldElementPosition`, id_of_field_effect).
+pub type FieldEffectLocation = (FieldElementPosition, String);
