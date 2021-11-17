@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::enums::{FourDirection};
 use crate::id_generator::IdGenerator;
-use crate::types::{FieldElementPosition, FieldEffectLocation, XYVector};
+use crate::types::{FieldElementPosition, XYVector};
 
 // TODO: 少なくとも、FieldObject の生成 -> 移動 -> 衝突で消滅 or 時間で消滅 の遷移が定義できないといけない。
 
@@ -42,6 +42,8 @@ pub struct FieldEffectCombination {
 impl FieldEffectCombination {
     // TODO: 多くの動きが設定できるようにする。
     pub fn new(id_generator: &mut IdGenerator, starting_point: FieldElementPosition, direction: FourDirection) -> Self {
+        // TODO: 複数の Create へ同じ inner_field_effect_id を設定したらエラーにする。
+        // TODO: Move が存在しない inner_field_effect_id を参照していたらエラーにする。
         let transitions: Vec<TransitionKind> = vec![
             TransitionKind::Create {
                 inner_field_effect_id: 1,
@@ -76,9 +78,7 @@ impl FieldEffectCombination {
             match transition {
                 // TODO: 構造体を含むパターンマッチの時に、ここへ使うフィールドだけ記述したい。
                 TransitionKind::Create {inner_field_effect_id, number_of_frames: _, vector: _} => {
-                    if !inner_ids.iter().any(|e| e == inner_field_effect_id) {
-                        inner_ids.push(inner_field_effect_id.clone());
-                    }
+                    inner_ids.push(inner_field_effect_id.clone());
                 },
                 _ => {},
             }
@@ -88,5 +88,59 @@ impl FieldEffectCombination {
             id_map.insert(inner_id.clone(), (id_generator.generate_for_field_effect(), None));
         }
         id_map
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod tests_of_create_id_map_from_transitions {
+        use super::*;
+
+        #[test]
+        fn it_should_return_an_empty_hash_map_when_there_are_no_transitions() {
+            let mut id_generator = IdGenerator::new(1);
+            let id_map = FieldEffectCombination::create_id_map_from_transitions(&mut id_generator, &vec![]);
+            assert!(id_map.is_empty());
+        }
+
+        #[test]
+        fn it_should_create_an_outer_field_effect_id_from_an_inner_field_effect_id() {
+            let mut id_generator = IdGenerator::new(1);
+            let id_map = FieldEffectCombination::create_id_map_from_transitions(&mut id_generator, &vec![
+                TransitionKind::Create {
+                    inner_field_effect_id: 11,
+                    number_of_frames: 1,
+                    vector: (0, 0),
+                },
+            ]);
+            assert_eq!(id_map.len(), 1);
+            assert_eq!(id_map.get(&11), Some(&(String::from("fe-1"), None)));
+        }
+        #[test]
+        fn it_should_create_ids_from_only_the_create_kind() {
+            let mut id_generator = IdGenerator::new(1);
+            let id_map = FieldEffectCombination::create_id_map_from_transitions(&mut id_generator, &vec![
+                TransitionKind::Create {
+                    inner_field_effect_id: 11,
+                    number_of_frames: 1,
+                    vector: (0, 0),
+                },
+                TransitionKind::Create {
+                    inner_field_effect_id: 12,
+                    number_of_frames: 1,
+                    vector: (0, 0),
+                },
+                TransitionKind::Move {
+                    inner_field_effect_id: 11,
+                    number_of_frames: 1,
+                    vector: (0, 0),
+                },
+            ]);
+            assert_eq!(id_map.len(), 2);
+            assert_eq!(id_map.get(&11), Some(&(String::from("fe-1"), None)));
+            assert_eq!(id_map.get(&12), Some(&(String::from("fe-2"), None)));
+        }
     }
 }
