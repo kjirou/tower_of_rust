@@ -5,8 +5,6 @@ use crate::enums::{FourDirection};
 use crate::id_generator::IdGenerator;
 use crate::types::{FieldElementPosition, XYVector};
 
-// TODO: 少なくとも、FieldObject の生成 -> 移動 -> 衝突で消滅 or 時間で消滅 の遷移が定義できないといけない。
-
 // TODO: どこかにまとめる。
 const MAX_NUMBER_OF_FRAMES: u64 = std::u64::MAX;
 
