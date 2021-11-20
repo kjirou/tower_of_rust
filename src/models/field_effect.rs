@@ -2,6 +2,7 @@
 pub struct FieldEffect {
     /// It is unique throughout the application.
     id: String,
+    // TODO: おそらく衝突したことがある FieldObject の情報を格納する必要がある。
 }
 impl FieldEffect {
     pub fn new(id: &str) -> Self {

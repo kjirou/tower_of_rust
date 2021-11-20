@@ -10,12 +10,14 @@ const MAX_NUMBER_OF_FRAMES: u64 = std::u64::MAX;
 
 #[derive(Debug)]
 pub enum TransitionKind {
+    // TODO: Move 相当の衝突時の挙動。消滅したりしなかったりする。
     // TODO: FieldEffect の種類を指定できるようにする。
     // TODO: 生成済みの FieldEffect を条件に生成できるようにする。
+    // TODO: 出来れば、同じ衝突履歴を共有する FieldEffect 群を設定したい。移動する範囲攻撃を一人に対して1回だけ衝突させたい時用に。
     Create {
         active_frame: u64,
         inner_field_effect_id: u32,
-        /// A vector to determine the location of the destination.
+        /// A vector to determine the destination from the starting point.
         /// 
         /// Set the vector for the upward pointing case.
         vector: XYVector,
