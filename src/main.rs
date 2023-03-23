@@ -2,7 +2,7 @@ extern crate clap;
 extern crate termion;
 extern crate tower_of_rust;
 
-use clap::{Arg, App};
+use clap::Parser;
 use std::io::{self, Write};
 use std::sync::mpsc;
 use std::thread;
@@ -13,19 +13,21 @@ use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use tower_of_rust::controller::Controller;
 
+/// A Tower of Rust
+#[derive(Parser, Debug)]
+#[command(version, about)]
+struct CommandArgs {
+    /// Run as a regular CLI application, not as a TUI application, for debugging
+    #[arg(short, long)]
+    debug: bool,
+}
+
 fn main() {
-    let command_args = App::new("A Tower of Rust")
-        .arg(
-            Arg::with_name("debug")
-                .long("debug")
-                .short("d")
-                .help("Don't run the TUI application for debugging with print functions.")
-        )
-        .get_matches();
+    let command_args = CommandArgs::parse();
 
     let mut controller = Controller::new();
     
-    if command_args.is_present("debug") {
+    if command_args.debug {
         let output = controller.create_screen_output_as_lines().join("\n");
         println!("{}", output);
     } else {
