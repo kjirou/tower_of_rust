@@ -17,12 +17,14 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: '1.68.0'
-      - uses: actions-rs/cargo@v1
+      - name: Run tests
+        uses: actions-rs/cargo@v1
         with:
           toolchain: '1.68.0'
           command: test
           args: -- --nocapture
-      - uses: actions-rs/cargo@v1
+      - name: Run app with debugging mode
+        uses: actions-rs/cargo@v1
         with:
           toolchain: '1.68.0'
           command: run
