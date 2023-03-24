@@ -22,3 +22,8 @@ jobs:
           toolchain: '1.68.0'
           command: test
           args: -- --nocapture
+      - uses: actions-rs/cargo@v1
+        with:
+          toolchain: '1.68.0'
+          command: run
+          args: -- --debug
