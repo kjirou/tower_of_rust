@@ -6,5 +6,5 @@ rust-version = "1.68"
 
 [dependencies]
 clap = { version = "4.1.11", features = ["derive"] }
-rand = "0.8.4"
+rand = "0.8.5"
 termion = "1.5.6"
