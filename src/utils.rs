@@ -157,19 +157,19 @@ mod tests_of_translate_position_by_direction {
     }
 }
 
-pub fn translate_rectangle_on_field(size: &RectangleSize, target_of_interest: &FieldElementPosition) -> XYCoordinates {
-    if size.0 % 2 == 0 || size.1 % 2 == 0 {
-        panic!("The size of the rectangle is odd only.");
+pub fn compute_map_xy_on_field(map_size: &RectangleSize, map_center: &FieldElementPosition) -> XYCoordinates {
+    if map_size.0 % 2 == 0 || map_size.1 % 2 == 0 {
+        panic!("The size of map rectangle is odd only.");
     }
-    let offset = (size.0 / 2, size.1 / 2);
+    let offset = (map_size.0 / 2, map_size.1 / 2);
     (
-        (target_of_interest.0 as i32 - offset.0 as i32),
-        (target_of_interest.1 as i32 - offset.1 as i32),
+        (map_center.0 as i32 - offset.0 as i32),
+        (map_center.1 as i32 - offset.1 as i32),
     )
 }
 
 #[cfg(test)]
-mod tests_of_translate_rectangle_on_field {
+mod tests_of_compute_map_xy_on_field {
     use super::*;
 
     mod when_it_does_not_panic {
@@ -203,7 +203,7 @@ mod tests_of_translate_rectangle_on_field {
             ];
             for test_case in table {
                 assert_eq!(
-                    translate_rectangle_on_field(test_case.args.0, test_case.args.1),
+                    compute_map_xy_on_field(test_case.args.0, test_case.args.1),
                     test_case.expected,
                 );
             }
@@ -213,13 +213,13 @@ mod tests_of_translate_rectangle_on_field {
     #[test]
     #[should_panic(expected = " is odd only")]
     fn it_panics_when_the_width_of_the_rectangle_is_even() {
-        translate_rectangle_on_field(&(2, 1), &(0, 0));
+        compute_map_xy_on_field(&(2, 1), &(0, 0));
     }
 
     #[test]
     #[should_panic(expected = " is odd only")]
     fn it_panics_when_the_height_of_the_rectangle_is_even() {
-        translate_rectangle_on_field(&(1, 2), &(0, 0));
+        compute_map_xy_on_field(&(1, 2), &(0, 0));
     }
 }
 
