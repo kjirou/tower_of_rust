@@ -6,7 +6,7 @@ use crate::models::field_object::DisplayKind;
 use crate::models::game::Game;
 use crate::screen_update::{MapElementUpdate, ScreenUpdate};
 use crate::types::{RectangleSize, XYCoordinates};
-use crate::utils::{translate_rectangle_on_field};
+use crate::utils::{compute_map_xy_on_field};
 
 fn create_field_element_display(field_element: &FieldElement) -> MapElementUpdate {
     let mut symbol = '.';
@@ -46,17 +46,17 @@ pub fn build(field: &Field, game: &Game) -> ScreenUpdate {
     // Map
     let map_size: RectangleSize = (21, 13);
     let mut map: Vec<Vec<MapElementUpdate>> = vec![];
-    let operation_target_xy: Option<XYCoordinates> = match &game.operation_target_location {
-        Some(operation_target_location) => Some(translate_rectangle_on_field(&map_size, &operation_target_location.0)),
+    let map_xy_on_field: Option<XYCoordinates> = match &game.operation_target_location {
+        Some(operation_target_location) => Some(compute_map_xy_on_field(&map_size, &operation_target_location.0)),
         _ => None,
     };
-    for map_y in 0..map_size.1 {
+    for y_on_map in 0..map_size.1 {
         let mut map_row: Vec<MapElementUpdate> = vec![];
-        for map_x in 0..map_size.0 {
-            let map_element_update: MapElementUpdate = match operation_target_xy {
-                Some(operation_target_xy) => {
-                    let xy = (operation_target_xy.0 + map_x as i32, operation_target_xy.1 + map_y as i32);
-                    let field_element = field.find_field_element_by_xy(&xy);
+        for x_on_map in 0..map_size.0 {
+            let map_element_update: MapElementUpdate = match map_xy_on_field {
+                Some(map_xy_on_field) => {
+                    let xy_on_field = (map_xy_on_field.0 + x_on_map as i32, map_xy_on_field.1 + y_on_map as i32);
+                    let field_element = field.find_field_element_by_xy(&xy_on_field);
                     match field_element {
                         Some(field_element) => create_field_element_display(field_element),
                         _ => MapElementUpdate {
